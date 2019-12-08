@@ -9,9 +9,10 @@ gc()
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 # Load packages
-toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl")
+toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr")
 
 lapply(toload,require, character.only = T)
+
 
 
 ## Construct Household Balance Sheet for First and Fifth Quintiles (following Domanski et al 2016)
@@ -21,8 +22,9 @@ financialAssets<-financialAsset[-c(1:6,13:84),]
 colnames(financialAssets)[1]<-"Percentile of income"
 
 stockHolding<-read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="Table 7")
-stockHoldings<-stockHolding[-c(1:7,14:26),-c(1:20,22:31)]
+stockHoldings<-stockHolding[-c(1:7,14:26),-c(2:20,22:31)]
 colnames(stockHoldings)[1]<-"Percentile of income"
+colnames(stockHoldings)[2]<-"Stock Holdings"
 
 nonfinancialAsset<-read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="Table 9 16", skip=2)
 nonfinancialAssets<-nonfinancialAsset[-c(1:92, 99:170),]
@@ -32,5 +34,11 @@ headers <- read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="
 headersDebt <- sapply(headers,paste,collapse="_")
 debt<-read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="Table 13 16 Alt", range="A98:K103", col_names = FALSE)
 names(debt)<-headersDebt
+colnames(debt)[1]<-"Percentile of income"
+
+householdPortfolio<-Reduce(function(x, y) left_join(x, y, by="Percentile of income"), list(financialAssets,stockHoldings,nonfinancialAssets, debt))
+
+
+
 
 
