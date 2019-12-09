@@ -46,5 +46,14 @@ householdPortfolio[1:3,5]<-0
 householdPortfolio[,2:31]<-as.numeric(unlist(householdPortfolio[,2:31]))
 
 
+# Calculate relative weights of each asset class for the different income quintiles (as percentage of total asset holdings)
+
+pcts <- as.data.frame(lapply(householdPortfolio[,-1], function(x) {
+  x / apply(householdPortfolio[,-1],1,sum)
+}))*100
+
+
+
+
 
 
