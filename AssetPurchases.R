@@ -6,6 +6,7 @@
 ## Prepare working space
 rm(list = ls())
 gc()
+
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 # Load packages
@@ -37,7 +38,12 @@ names(debt)<-headersDebt
 colnames(debt)[1]<-"Percentile of income"
 
 householdPortfolio<-Reduce(function(x, y) left_join(x, y, by="Percentile of income"), list(financialAssets,stockHoldings,nonfinancialAssets, debt))
-
+colnames(householdPortfolio)[c(11,19,23,24,25,26,28,29,30,31)]<-c("Other financial assets", "Other nonfinancial assets", 
+                                                                  "HELOC - Secured by primary residence", "Other residential debt", 
+                                                                  "Credit card balances", "Lines of credit not secured by residential property",
+                                                                  "Vehicle loans", "Other installment loans", "Other debt", "Any debt")
+householdPortfolio[1:3,5]<-0
+householdPortfolio[,2:31]<-as.numeric(unlist(householdPortfolio[,2:31]))
 
 
 
