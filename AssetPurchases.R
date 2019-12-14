@@ -20,8 +20,28 @@ lapply(toload,require, character.only = T)
 data <- lapply(paste0("Data/",list.files("Data")), function(x) read_csv(x)[2])
 data <- lapply(data, as.ts)
 
+data_framer<-function(position, name){
+  variable<-deparse(substitute(name))
+  number<-as.numeric(deparse(substitute(position)))
+  assign(variable, as.data.frame(data[[number]]), env =.GlobalEnv)
+}
+
+data_framer(1, TenYearTreasury)
+data_framer(2, FedTotalAssets)
+data_framer(3, GDP)
+data_framer(4, TIPSYield)
+data_framer(5, HousePrices)
+data_framer(6, Wilshire5000)
 
 
+
+
+
+
+# mapply(data_framer, 1:6, as.list(list.files("Data")))? 
+
+
+# Equalise lengths of lists (eg so that there is a GDP entry for each )
 
 
 ## Construct Household Balance Sheet for First and Fifth Quintiles 
