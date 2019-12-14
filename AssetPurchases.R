@@ -17,14 +17,21 @@ lapply(toload,require, character.only = T)
 
 ## Read-in data (GDP, Fed Total Assets, Long Term Average TIPS Yield, Wilshire 5000, Median Sales Price)
 
-data <- lapply(paste0("Data/",list.files("Data")), function(x) read_csv(x)[2])
+data <- lapply(paste0("Data/",list.files("Data")), function(x) read_csv(x)[column_position])
 data <- lapply(data, as.ts)
 
-data_framer<-function(position, name){
-  variable<-deparse(substitute(name))
-  number<-as.numeric(deparse(substitute(position)))
-  assign(variable, as.data.frame(data[[number]]), env =.GlobalEnv)
+data_reader<-function(column){
+  
+  column_position<-as.numeric(deparse(substitute(column)))
+  data<-lapply(paste0("Data/",list.files("Data")), function(x) read_csv(x)[column_position])
+  data <- lapply(data, as.ts)
 }
+
+data_framer<-function(position, name){
+    variable<-deparse(substitute(name))
+    number<-as.numeric(deparse(substitute(position)))
+    assign(variable, as.data.frame(data[[number]]), env =.GlobalEnv)
+} 
 
 data_framer(1, TenYearTreasury)
 data_framer(2, FedTotalAssets)
@@ -33,6 +40,34 @@ data_framer(4, TIPSYield)
 data_framer(5, HousePrices)
 data_framer(6, Wilshire5000)
 
+
+
+
+
+
+
+ts_organise_data<-function(column, position, name){
+  
+  data_reader<-function(column){
+    
+    column_position<-as.numeric(deparse(substitute(column)))
+    data<-lapply(paste0("Data/",list.files("Data")), function(x) read_csv(x)[column_position])
+    data <- lapply(data, as.ts)
+  }
+  
+  gg<-data_reader(column_position)
+  
+  data_framer<-function(position, name){
+    variable<-deparse(substitute(name))
+    number<-as.numeric(deparse(substitute(position)))
+    assign(variable, as.data.frame(gg[[number]]), env =.GlobalEnv)
+  }
+  
+}
+
+
+
+ts_organise_data(2, 1, TenYearTreasury)
 
 
 
