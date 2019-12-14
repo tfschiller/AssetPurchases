@@ -10,13 +10,21 @@ gc()
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 # Load packages
-toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr")
+toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr", "astsa", "vars", "urca", "lubridate")
 
 lapply(toload,require, character.only = T)
 
 
+## Read-in data (GDP, Fed Total Assets, Long Term Average TIPS Yield, Wilshire 5000, Median Sales Price)
 
-## Construct Household Balance Sheet for First and Fifth Quintiles (following Domanski et al 2016)
+data <- lapply(paste0("Data/",list.files("Data")), function(x) read_csv(x)[2])
+data <- lapply(data, as.ts)
+
+
+
+
+
+## Construct Household Balance Sheet for First and Fifth Quintiles 
 
 financialAsset<-read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="Table 6 16", skip=88)
 financialAssets<-financialAsset[-c(1:6,13:84),]
@@ -51,6 +59,9 @@ householdPortfolio[,2:31]<-as.numeric(unlist(householdPortfolio[,2:31]))
 pcts <- as.data.frame(lapply(householdPortfolio[,-1], function(x) {
   x / apply(householdPortfolio[,-1],1,sum)
 }))*100
+
+
+# Keep only the asset class a la Domanski et al 2016
 
 
 
