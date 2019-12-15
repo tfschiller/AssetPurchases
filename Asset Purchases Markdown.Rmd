@@ -1,7 +1,7 @@
 ---
 title: "The Effect of Asset Purchase Programmes on Asset Prices and Inequality"
 author: "Thomas Schiller"
-date: "12/12/2019"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
   pdf_document: default
   html_document: default
@@ -13,13 +13,45 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-In response to the Global Financial Crisis (GFC), on October 8<sup>th</sup> 2008, the Federal Researve, along with five other central banks, collectively reduced interest rates. The Federal Open Market Committee (FOMC) lowered its federal funds rate target to 1.5 percent. Then, on December 16<sup>th</sup> 2008, the FOMC cut its target rate effectively to zero (a target rate between 0 and 0.25 percent). 
+In response to the Global Financial Crisis (GFC), on October 8 2008, the Federal Researve, along with five other central banks, collectively reduced interest rates. The Federal Open Market Committee (FOMC) lowered its federal funds rate target to 1.5 percent. Then, on December 16 2008, the FOMC cut its target rate effectively to zero (a target rate between 0 and 0.25 percent). 
 
 In addition, the Federal Reserve (along with other central banks) launched a large-scale asset purchase (LSAP) programme on November 25<supth</sup> (QE1) with the intention of providing additional monetary stimulus to the economy (Hesse, Hofmann and Weber 2018). LSAP programmes, along with other _balance sheet policies_, are one of the two ways in which central banks implement monetary policy (the other being _interest rate policy_)  (Borio and Zabai 2016). 
+\
+\
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
--- Plot of Fed balance sheet --   
+setwd(here::here())
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(lubridate)
+library(scales)
+library(here)
 
+
+GDP<-read_csv("./Data/FedTotalAssets.csv")
+
+theme_update(plot.title = element_text(hjust = 0.5))
+
+## FED Assets 
+
+ggplot(GDP, aes(x=as_date(unlist(GDP[1])), y=unlist(GDP[2]), group = 1))+ 
+  geom_line(color = "#09557f",alpha = 0.6,size = 0.7)+ 
+  scale_x_date(date_breaks = "1 year", date_labels =  "%Y")+
+  theme(axis.title.x = element_blank())+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+  scale_y_continuous(labels=comma, name="Millions of U.S. Dollars", breaks = scales::pretty_breaks(n = 8))+
+  theme(axis.title=element_text(size=8))+
+  ggtitle("Federal Reserve Total Assets (Less Eliminations from Consolidation)")+theme(plot.title = element_text(size=10))
+    
+    
+    
+```
+\
+\
 This paper analyses the effects of the Federal Reserve's LSAP programmes. Specifically, the effects on asset prices and wealth inequality are analysed. This is done using an SVAR approach to compute the effects of LSAP on asset prices, among other variables. The effects will then be used to compute a measure of the effect on inequality, following the approach of Domanski, Scatigna and Zabai (2016).    
+
+
+## Literature Review 
 
 
 ## References 
