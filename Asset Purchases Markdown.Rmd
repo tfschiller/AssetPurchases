@@ -3,19 +3,24 @@ title: "The Effect of Asset Purchase Programmes on Asset Prices and Inequality"
 author: "Thomas Schiller"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
+  fig.width: 6
+  fig.height: 4
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=6.5, fig.height=4) 
 ```
 
 ## Introduction
 
-In response to the Global Financial Crisis (GFC), on October 8 2008, the Federal Researve, along with five other central banks, collectively reduced interest rates. The Federal Open Market Committee (FOMC) lowered its federal funds rate target to 1.5 percent. Then, on December 16 2008, the FOMC cut its target rate effectively to zero (a target rate between 0 and 0.25 percent). 
+On October 8 2008, in response to the Global Financial Crisis (GFC), the Federal Reserve, along with five other central banks around the world, collectively cut interest rates. This followed earlier cuts by the Federal Open Market Committee (FOMC), where it had been lowered its federal funds rate target from 5.25 percent in June 2006 to 1.5 percent following the cut on October 8 2008. On December 16 2008, the FOMC cut its target rate effectively to zero (a target rate between 0 and 0.25 percent). 
 
-In addition, the Federal Reserve (along with other central banks) launched a large-scale asset purchase (LSAP) programme on November 25<supth</sup> (QE1) with the intention of providing additional monetary stimulus to the economy (Hesse, Hofmann and Weber 2018). LSAP programmes, along with other _balance sheet policies_, are one of the two ways in which central banks implement monetary policy (the other being _interest rate policy_)  (Borio and Zabai 2016). 
+At the time, the FOMC stated that along with cutting its federal funds rate target, it would 'employ all available tools to promote the resumption of sustainable economic growth and to preserve price stability' (FOMC 2008b). Therefore, with its conventional policy tool at the zero lower bound, the Federal Reserve (along with other central banks) launched a large-scale asset purchase (LSAP) programme on November 25 2008 with the intention of providing additional monetary stimulus to the economy (Hesse, Hofmann and Weber 2018). 
+
+In November 2008, as part of its QE1 programme, the Federal Reserve announced it would buy $100 billion in government-sponsored enterprise debt and up to $500 billion worth of mortgage-backed securities. Since LSAP1, the Federal Reserve has conducted two further LSAP programmes: QE2 (announced in March 2010) and QE3 (announced in September 2012). These programmes have contributed significantly to the growth in the Federal Reserve's balance sheet since 2008 (see Figure 1).  
 \
 \
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -38,26 +43,52 @@ theme_update(plot.title = element_text(hjust = 0.5))
 ggplot(GDP, aes(x=as_date(unlist(GDP[1])), y=unlist(GDP[2]), group = 1))+ 
   geom_line(color = "#09557f",alpha = 0.6,size = 0.7)+ 
   scale_x_date(date_breaks = "1 year", date_labels =  "%Y")+
-  theme(axis.title.x = element_blank())+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
-  scale_y_continuous(labels=comma, name="Millions of U.S. Dollars", breaks = scales::pretty_breaks(n = 8))+
-  theme(axis.title=element_text(size=8))+
-  ggtitle("Federal Reserve Total Assets (Less Eliminations from Consolidation)")+theme(plot.title = element_text(size=10))
-    
-    
+  theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
+  scale_y_continuous(labels=comma, name="Millions of U.S. Dollars", breaks = scales::pretty_breaks(n = 10))+
+  theme(axis.title=element_text(size=8), axis.text=element_text(size=8))+
+  ggtitle("Figure 1: Federal Reserve Total Assets (Less Eliminations from Consolidation)")+theme(plot.title = element_text(size=10))+
+  theme( # remove the vertical grid lines
+    panel.grid.major.x = element_blank() ,
+    # explicitly set the horizontal lines (or they will disappear too)
+    panel.grid.major.y = element_line( size=.3, color="grey" ))+
+  theme(axis.ticks.y = element_blank())
     
 ```
 \
 \
-This paper analyses the effects of the Federal Reserve's LSAP programmes. Specifically, the effects on asset prices and wealth inequality are analysed. This is done using an SVAR approach to compute the effects of LSAP on asset prices, among other variables. The effects will then be used to compute a measure of the effect on inequality, following the approach of Domanski, Scatigna and Zabai (2016).    
+When the Federal Reserve announced the LSAP1 programme, it did so with the intention of 'supporting housing markets and fostering improved conditions in financial markets' (FOMC 2008a). However, despite the fact the Bank of Japan had experimented with LSAP before 2008 (see Iwata and Takenaka 2012 for an overview), the scale and enduring nature of LSAP programmes, relative to pre-crisis policy, is what has made these monetary policy tools unconventional, with the precise nature of their effects the subject of much research.   
 
+This paper analyses the effects of the Federal Reserve's LSAP programmes using data up to the beginning of 2019. Specifically, the effects on asset prices and wealth inequality are analysed. This is done using an SVAR model to compute the effects of the Federal Reserve's LSAP programmes on asset prices, along with other macroeconomic and financial variables. The effects will then be used to compute a measure of the effect on inequality, following the approach of Domanski, Scatigna and Zabai (2016). 
+ 
+ 
+ 
+## Literature Review
 
-## Literature Review 
+#### LSAP as a Monetary Policy Tool
 
+LSAP programmes, along with other _balance sheet policies_, are one of the two ways in which central banks implement monetary policy (the other being _interest rate policy_). As mentioned, LSAPs have played a significant role in the Federal Reserve's attempts to influence asset prices and financial conditions and to stimulate economic conditions after the federal funds target was cut to near zero. 
 
+Two transmission mechansims through which LSAP affect asset prices are commonly identified in the literature: the 'portfolio balance effect' and the 'signalling effect'. The portfolio balance effect relies on the assumption that assets are imperfect substitutes so that as the Federal Reserve buys safer, longer-term assets, the price of these assets has to rise (and yields fall) so that households are willing to move their portfolios into riskier, short term assets, increasing prices and depressing yields on this class of assets as well (Gagnon, Raskin, Remache & Sack 2011). 
+
+How increased asset prices/financial conditions increases economic growth
+
+Borio and Zabai (2016) survey evidence on the effects of unconventional monetary policy measures since 2008. While they conclude that 'there is little doubt that [unconventional monetary policy measures] have had a lasting impact on bond yields [and] various asset prices' (p. 1), it is harder to distengle the effects owing to specific measures individually (for example the impact LSAP from that of forward guidance).     
+  
+#### LSAP and Wealth Inequality
+  
+  
 ## References 
 
-Borio, C. Zabai A.(2016):  Unconventional monetary policies:  are-appraisal (No.  570).  BIS Working Papers
+Board of Governors of the Federal Reserve System (2008, November 25) _FOMC Statement_ [Press Release]. Retrieved from: https://www.federalreserve.gov/newsevents/pressreleases/monetary20081125b.htm
 
-Domanski, D., Scatigna, M.,   Zabai, A. (2016).  Wealth inequalityand monetary policy.  BIS Quarterly Review March
+Board of Governors of the Federal Reserve System (2008, December 16) _FOMC Statement_ [Press Release]. Retrieved from: https://www.federalreserve.gov/newsevents/pressreleases/monetary20081216b.htm
 
-Hesse, H., Hofmann, B.,   Weber, J. (2018).  The macroeconomiceffects of asset purchases revisited (No.  680).  BIS Working Papers
+Borio, C. Zabai A. (2016). Unconventional monetary policies:  a re-appraisal.  _BIS Working Papers (No. 570)_.
+
+Domanski, D., Scatigna, M.,   Zabai, A. (2016).  Wealth inequalityand monetary policy.  _BIS Quarterly Review (March)_.
+
+Gagnon, J., Raskin, M., Remache, J., and Sack, B. (2011). The financial market effects of the Federal Reserve’s large-scale asset purchases. _International Journal of Central Banking_. 7(1), pp. 3-43.
+
+Hesse, H., Hofmann, B., and  Weber, J. (2018).  The macroeconomiceffects of asset purchases revisited. _BIS Working Papers (No.  680)_.
+
+Iwata, K. and Takenaka, S. (2012). Central bank balance sheet expansion: Japan's experience. In: _Are central bank balance sheets in Asia too large?_. Bank for International Settlements, pp. 132-159.
