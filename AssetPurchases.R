@@ -72,7 +72,6 @@ ts_organise_data(2, 1, TenYearTreasury)
 
 
 
-
 # mapply(data_framer, 1:6, as.list(list.files("Data")))? 
 
 
