@@ -3,8 +3,8 @@ title: "The Effect of Asset Purchase Programmes on Asset Prices and Inequality"
 author: "Thomas Schiller"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
   fig.width: 6
   fig.height: 4
 ---
@@ -18,9 +18,9 @@ knitr::opts_chunk$set(fig.width=6.5, fig.height=4)
 
 On October 8 2008, in response to the Global Financial Crisis (GFC), the Federal Reserve, along with five other central banks around the world, collectively cut interest rates. This followed earlier cuts by the Federal Open Market Committee (FOMC), where it had been lowered its federal funds rate target from 5.25 percent in June 2006 to 1.5 percent following the cut on October 8 2008. On December 16 2008, the FOMC cut its target rate effectively to zero (a target rate between 0 and 0.25 percent). 
 
-At the time, the FOMC stated that along with cutting its federal funds rate target, it would 'employ all available tools to promote the resumption of sustainable economic growth and to preserve price stability' (FOMC 2008b). Therefore, with its conventional policy tool at the zero lower bound, the Federal Reserve (along with other central banks) launched a large-scale asset purchase (LSAP) programme on November 25 2008 with the intention of providing additional monetary stimulus to the economy (Hesse, Hofmann and Weber 2018). 
+At the time, the FOMC stated that along with cutting its federal funds rate target, it would 'employ all available tools to promote the resumption of sustainable economic growth and to preserve price stability' (\hyperlink{fomc2008b}{FOMC 2008b}). Therefore, with its conventional policy tool at the zero lower bound, the Federal Reserve (along with other central banks) launched a large-scale asset purchase (LSAP) programme on November 25 2008 with the intention of providing additional monetary stimulus to the economy (\hyperlink{hesse2018}{Hesse, Hofmann and Weber 2018}). 
 
-In November 2008, as part of its QE1 programme, the Federal Reserve announced it would buy $100 billion in government-sponsored enterprise debt and up to $500 billion worth of mortgage-backed securities. Since LSAP1, the Federal Reserve has conducted two further LSAP programmes: QE2 (announced in March 2010) and QE3 (announced in September 2012). These programmes have contributed significantly to the growth in the Federal Reserve's balance sheet since 2008 (see Figure 1).  
+In November 2008, as part of its QE1 programme, the Federal Reserve announced it would buy \$100 billion in government-sponsored enterprise debt and up to \$500 billion worth of mortgage-backed securities. Since LSAP1, the Federal Reserve has conducted two further LSAP programmes: QE2 (announced in March 2010) and QE3 (announced in September 2012). These programmes have contributed significantly to the growth in the Federal Reserve's balance sheet since 2008 (see Figure 1).  
 \
 \
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
@@ -56,9 +56,9 @@ ggplot(GDP, aes(x=as_date(unlist(GDP[1])), y=unlist(GDP[2]), group = 1))+
 ```
 \
 \
-When the Federal Reserve announced the LSAP1 programme, it did so with the intention of 'supporting housing markets and fostering improved conditions in financial markets' (FOMC 2008a). However, despite the fact the Bank of Japan had experimented with LSAP before 2008 (see Iwata and Takenaka 2012 for an overview), the scale and enduring nature of LSAP programmes, relative to pre-crisis policy, is what has made these monetary policy tools unconventional, with the precise nature of their effects the subject of much research.   
+When the Federal Reserve announced the LSAP1 programme, it did so with the intention of 'supporting housing markets and fostering improved conditions in financial markets' (\hyperlink{fomc2008a}{FOMC 2008a}). However, despite the fact the Bank of Japan had experimented with LSAPs before 2008 (see \hyperlink{iwata2012}{Iwata and Takenaka 2012} for an overview), the scale and enduring nature of LSAP programmes, relative to pre-crisis policy, is what has made these monetary policy tools unconventional, with the precise nature of their effects the subject of much research.   
 
-This paper analyses the effects of the Federal Reserve's LSAP programmes using data up to the beginning of 2019. Specifically, the effects on asset prices and wealth inequality are analysed. This is done using an SVAR model to compute the effects of the Federal Reserve's LSAP programmes on asset prices, along with other macroeconomic and financial variables. The effects will then be used to compute a measure of the effect on inequality, following the approach of Domanski, Scatigna and Zabai (2016). 
+This paper analyses the effects of the Federal Reserve's LSAP programmes using data up to the beginning of 2019. Specifically, the effects on asset prices and wealth inequality are analysed. This is done using an SVAR model to compute the effects of the Federal Reserve's LSAP programmes on asset prices, along with other macroeconomic and financial variables. The effects will then be used to compute a measure of the effect on inequality, following the approach of (\hyperlink{domanski2016}{Domanski, Scatigna and Zabai (2016)}). 
  
  
  
@@ -68,27 +68,45 @@ This paper analyses the effects of the Federal Reserve's LSAP programmes using d
 
 LSAP programmes, along with other _balance sheet policies_, are one of the two ways in which central banks implement monetary policy (the other being _interest rate policy_). As mentioned, LSAPs have played a significant role in the Federal Reserve's attempts to influence asset prices and financial conditions and to stimulate economic conditions after the federal funds target was cut to near zero. 
 
-Two transmission mechansims through which LSAP affect asset prices are commonly identified in the literature: the 'portfolio balance effect' and the 'signalling effect'. The portfolio balance effect relies on the assumption that assets are imperfect substitutes so that as the Federal Reserve buys safer, longer-term assets, the price of these assets has to rise (and yields fall) so that households are willing to move their portfolios into riskier, short term assets, increasing prices and depressing yields on this class of assets as well (Gagnon, Raskin, Remache & Sack 2011). 
+Two transmission mechansims through which LSAPs affect asset prices are commonly identified in the literature: the 'portfolio rebalancing effect' and the 'signalling effect'. The portfolio balance effect relies on the assumption that assets are imperfect substitutes. This means that as the Federal Reserve buys safer, longer-term assets (eg long-term Treasuries), the price of these assets has to rise (and yields fall) so that households are willing to move their portfolios into riskier, short term assets, increasing prices and depressing yields on these assets^[More specifically \hyperlink{wallace1981}{Wallace Neutrality (1981)} does not hold.]. 
+
+Therefore as well as depressing longer-term yields on the class of assets purchased by the central bank, the portfolio rebalance effect results in households and private agents moving out of now lower yielding agency debt, MBS and Treasuries into other shorter term, riskier assets such as equities and coporate bonds. This has the effect of reducing the yields and increasing the prices on these assets as well (\hyperlink{gagnon2011}{Gagnon, Raskin, Remache and Sack 2011}). Therefore, LSAPs has the effect of increasing prices and reducing yields across a broad range of assets^[The portfolio rebalancing effect also works to reduce interest rates through a reduction in risk premiums. Specifically when Federal Reserve purchases longer-term securities it removes the "term premium" - the risk associated with holding longer duration assets, which is an important component in risk premiums - from the market.  Reducing risk premiums in general improves market functioning. For wider discussions of this see \hyperlink{gagnon2011}{Gagnon et al. 2011} and \hyperlink{mishkin2016}{Mishkin (2016)}].
+
+The 
+
+The signalling effect occurs when the Federal Reserve makes a credible commitment to continue its LSAP programmes into the future. For example, when the Federal Reserve announed QE3, it committed to purchasing \$40 billion worth of MBS and \$45 billion of longer-term Treasuries 'until the outlook for the labour market has improved substantially in a context of price stability' \hyperlink{fomc2013}{(FOMC 2013)}. Therefore the FOMC makes a state-contingent commitment to maintain LSAPs until its wider macroeconomic objectives have been achieved, namely achieving its inflation target, increased employment and growth.    
+
+In general this type of commitment signals that monetary policy will be kept loose for a certain duration. This should further reduce long-term interest rates as agents know rates will be lower for longer. Also, a commitment to continue LSAPs indicates interest rates will be held low. Specifically, if the Federal Reserve commits to buying assets at a future date, then the price of these assets will rise now (otherwise arbitrage is possible: agents could buy these assets now and sell them to the Federal Reserve at a higher price as a result of higher demand in the market) (\hyperlink{gangnon2011}{Gagnon et al. 2011}). 
+
+The intended consequences of LSAPs through, as a result of the portfolio rebalacing effect and the signalling effect, is to depress yields and increase asset prices across different asset classes. The intention is for this to work to increase consumption and investment, this having a positive 
 
 How increased asset prices/financial conditions increases economic growth
 
-Borio and Zabai (2016) survey evidence on the effects of unconventional monetary policy measures since 2008. While they conclude that 'there is little doubt that [unconventional monetary policy measures] have had a lasting impact on bond yields [and] various asset prices' (p. 1), it is harder to distengle the effects owing to specific measures individually (for example the impact LSAP from that of forward guidance).     
+\hyperlink{borio-2016}{Borio and Zabai (2016)} survey evidence on the effects of unconventional monetary policy measures since 2008. While they conclude that 'there is little doubt that [unconventional monetary policy measures] have had a lasting impact on bond yields [and] various asset prices' (p. 1), it is harder to distengle the effects owing to specific measures individually (for example the impact of LSAPs from that of forward guidance).    
+
+- short data timespan due to  
   
 #### LSAP and Wealth Inequality
   
   
 ## References 
 
-Board of Governors of the Federal Reserve System (2008, November 25) _FOMC Statement_ [Press Release]. Retrieved from: https://www.federalreserve.gov/newsevents/pressreleases/monetary20081125b.htm
+\hypertarget{fomc2008a}{Board of Governors of the Federal Reserve System (2008, November 25) \textit{Federal Reserve announces it will initiate a program to purchase the direct obligations of housing-related government-sponsored enterprises and mortgage-backed securities backed by Fannie Mae, Freddie Mac, and Ginnie Mae} [Press Release]. Retrieved from: \url{https://www.federalreserve.gov/newsevents/pressreleases/monetary20081125b.htm}}
 
-Board of Governors of the Federal Reserve System (2008, December 16) _FOMC Statement_ [Press Release]. Retrieved from: https://www.federalreserve.gov/newsevents/pressreleases/monetary20081216b.htm
+\hypertarget{fomc2008b}{Board of Governors of the Federal Reserve System (2008, December 16) \textit{FOMC Statement} [Press Release]. Retrieved from: \url{https://www.federalreserve.gov/newsevents/pressreleases/monetary20081216b.htm}}
 
-Borio, C. Zabai A. (2016). Unconventional monetary policies:  a re-appraisal.  _BIS Working Papers (No. 570)_.
+\hypertarget{fomc2013}{Board of Governors of the Federal Reserve System (2013, September 18) \textit{Federal Reserve issues FOMC Statement} [Press Release]. Retrieved from: \url{https://www.federalreserve.gov/newsevents/pressreleases/monetary20130918a.htm}}
 
-Domanski, D., Scatigna, M.,   Zabai, A. (2016).  Wealth inequalityand monetary policy.  _BIS Quarterly Review (March)_.
+\hypertarget{borio-2016}{Borio, C. Zabai A. (2016). Unconventional monetary policies:  a re-appraisal.  \textit{BIS Working Papers (No. 570)}.}
 
-Gagnon, J., Raskin, M., Remache, J., and Sack, B. (2011). The financial market effects of the Federal Reserve’s large-scale asset purchases. _International Journal of Central Banking_. 7(1), pp. 3-43.
+\hypertarget{domanski2016}{Domanski, D., Scatigna, M.,   Zabai, A. (2016).  Wealth inequalityand monetary policy.  \textit{BIS Quarterly Review (March)}}.
 
-Hesse, H., Hofmann, B., and  Weber, J. (2018).  The macroeconomiceffects of asset purchases revisited. _BIS Working Papers (No.  680)_.
+\hypertarget{gangnon2011}{Gagnon, J., Raskin, M., Remache, J., and Sack, B. (2011). The financial market effects of the Federal Reserve’s large-scale asset purchases. \textit{International Journal of Central Banking}. 7(1), pp. 3-43.}
 
-Iwata, K. and Takenaka, S. (2012). Central bank balance sheet expansion: Japan's experience. In: _Are central bank balance sheets in Asia too large?_. Bank for International Settlements, pp. 132-159.
+\hypertarget{hesse2018}{Hesse, H., Hofmann, B., and  Weber, J. (2018).  The macroeconomiceffects of asset purchases revisited. \textit{BIS Working Papers (No.  680)}.}
+
+\hypertarget{iwata2012}{Iwata, K. and Takenaka, S. (2012). Central bank balance sheet expansion: Japan's experience. In: \textit{Are central bank balance sheets in Asia too large?}. Bank for International Settlements, pp. 132-159.}
+
+\hypertarget{mishkin2016}{Mishkin, F. (2016). \underline{The economics of money, banking, and financial markets}. 11th ed. Boston: Pearson.}  
+
+\hypertarget{wallace1981}{Wallace, N. (1981). A Modigliani-Miller theorem for open-market operations. \textit{The American Economic Review}. 71(3), pp. 267-274.}
