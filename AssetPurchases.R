@@ -10,14 +10,14 @@ gc()
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 # Load packages
-toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr", "astsa", "vars", "urca", "lubridate", "rlist")
+toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr", "astsa", "vars", "urca", "lubridate", "rlist", "zoo", "xts")
 
 lapply(toload,require, character.only = T)
 
 
 ## Read-in data (GDP, Fed Total Assets, Long Term Average TIPS Yield, Wilshire 5000, Median Sales Price)
 
-# Function to read in GDP, Fed Total Assets, Long Term Average TIPS Yield, Wilshire 5000, Median Sales Price data (ie column = 2)
+# Function to read in variables (GDP, Fed Total Assets, Long Term Average TIPS Yield, Wilshire 5000, Median Sales Price)
 data_reader<-function(column){
   
   column_position<-as.numeric(deparse(substitute(column)))
@@ -34,63 +34,21 @@ time <- lapply(paste0("Data/",list.files("Data")), function(x) read_csv(x)[1])
 names(time)<-names
 
 
+# For loop to read-in data to Global Environment, variable by variable
 for (i in 1:length(time)) {
   
   assign(names[i], do.call(rbind, Map(data.frame, A=time[i], B=data[i])), env =.GlobalEnv)
   
 }
 
-
-TenYearTreasury<-(read_csv("Data/10YearTreasuryConstantMaturity.csv"))
-TenYearTreasuryTime<-tibble(as_date(unlist(TenYearTreasury[1])))
+# Convert to xts
 
 
 
-data_framer<-function(position, name){
-  variable<-deparse(substitute(name))
-  number<-as.numeric(deparse(substitute(position)))
-  assign(variable, as.data.frame(data[[number]]), env =.GlobalEnv)
-}
+## Equalise lengths of lists (eg so that there is a GDP entry for each )
+daily<-seq(GDP$GDPC1[1], tail(GDP$GDPC1,1), by="day")
 
-data_framer(1, TenYearTreasury)
-data_framer(2, FedTotalAssets)
-data_framer(3, GDP)
-data_framer(4, TIPSYield)
-data_framer(5, HousePrices)
-data_framer(6, Wilshire5000)
-
-
-
-ts_organise_data<-function(column, position, name){
-  
-  data_reader<-function(column){
-    
-    column_position<-as.numeric(deparse(substitute(column)))
-    data<-lapply(paste0("Data/",list.files("Data")), function(x) read_csv(x)[column_position])
-    data <- lapply(data, as.ts)
-  }
-  
-  gg<-data_reader(column_position)
-  
-  data_framer<-function(position, name){
-    variable<-deparse(substitute(name))
-    number<-as.numeric(deparse(substitute(position)))
-    assign(variable, as.data.frame(gg[[number]]), env =.GlobalEnv)
-  }
-  
-}
-
-
-
-ts_organise_data(2, 1, TenYearTreasury)
-
-
-
-
-# mapply(data_framer, 1:6, as.list(list.files("Data")))? 
-
-
-# Equalise lengths of lists (eg so that there is a GDP entry for each )
+GDP2<-
 
 
 ## Construct Household Balance Sheet for First and Fifth Quintiles 
