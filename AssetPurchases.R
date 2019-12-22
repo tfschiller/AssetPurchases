@@ -10,15 +10,41 @@ gc()
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 # Load packages
-toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr", "astsa", "vars", "urca", "lubridate")
+toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr", "astsa", "vars", "urca", "lubridate", "rlist")
 
 lapply(toload,require, character.only = T)
 
 
 ## Read-in data (GDP, Fed Total Assets, Long Term Average TIPS Yield, Wilshire 5000, Median Sales Price)
 
-data <- lapply(paste0("Data/",list.files("Data")), function(x) read_csv(x)[2])
-data <- lapply(data, as.ts)
+# Function to read in GDP, Fed Total Assets, Long Term Average TIPS Yield, Wilshire 5000, Median Sales Price data (ie column = 2)
+data_reader<-function(column){
+  
+  column_position<-as.numeric(deparse(substitute(column)))
+  data<-lapply(paste0("Data/",list.files("Data")), function(x) read_csv(x)[column_position])
+  data <- lapply(data, as.ts)
+}
+
+data <- data_reader(2)
+names<-tools::file_path_sans_ext(list.files("Data"))
+names(data)<-names
+
+# Read in corresponding dates and change name of list items to names of variables
+time <- lapply(paste0("Data/",list.files("Data")), function(x) read_csv(x)[1])
+names(time)<-names
+
+
+for (i in 1:length(time)) {
+  
+  assign(names[i], do.call(rbind, Map(data.frame, A=time[i], B=data[i])), env =.GlobalEnv)
+  
+}
+
+
+TenYearTreasury<-(read_csv("Data/10YearTreasuryConstantMaturity.csv"))
+TenYearTreasuryTime<-tibble(as_date(unlist(TenYearTreasury[1])))
+
+
 
 data_framer<-function(position, name){
   variable<-deparse(substitute(name))
@@ -34,6 +60,29 @@ data_framer(5, HousePrices)
 data_framer(6, Wilshire5000)
 
 
+
+ts_organise_data<-function(column, position, name){
+  
+  data_reader<-function(column){
+    
+    column_position<-as.numeric(deparse(substitute(column)))
+    data<-lapply(paste0("Data/",list.files("Data")), function(x) read_csv(x)[column_position])
+    data <- lapply(data, as.ts)
+  }
+  
+  gg<-data_reader(column_position)
+  
+  data_framer<-function(position, name){
+    variable<-deparse(substitute(name))
+    number<-as.numeric(deparse(substitute(position)))
+    assign(variable, as.data.frame(gg[[number]]), env =.GlobalEnv)
+  }
+  
+}
+
+
+
+ts_organise_data(2, 1, TenYearTreasury)
 
 
 
