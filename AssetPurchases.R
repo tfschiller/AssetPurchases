@@ -62,12 +62,21 @@ convert_to_xts(Wilshire5000)
 daily<-xts(,seq(start(GDP),end(GDP),"days"))
 
 
-# Function that converts datasets of different intervals into daily, filling with most recent value
+# Function that converts datasets of different intervals into daily, filling with most recent value using daily index
 convert_to_daily<-function(dataset){
   aa <-deparse(substitute(dataset))
   dd <-merge(dataset, daily) 
   assign(aa, na.locf(dd), env =.GlobalEnv)
 }
+
+convert_to_daily(FedTotalAssets)
+convert_to_daily(GDP)
+convert_to_daily(LongTermAverageTIPSYield)
+convert_to_daily(MedianSalesPriceHouses)
+convert_to_daily(TenYearTreasuryConstantMaturity)
+convert_to_daily(Wilshire5000)
+
+
 
 
 ## Construct Household Balance Sheet for First and Fifth Quintiles 
