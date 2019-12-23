@@ -77,6 +77,17 @@ convert_to_daily(TenYearTreasuryConstantMaturity)
 convert_to_daily(Wilshire5000)
 
 
+## Calucate Inflation Expectations (Inflation Expectation = Treasury Yield - TIPs Yield)
+InflationExpectations<-TenYearTreasuryConstantMaturity - LongTermAverageTIPSYield
+
+
+
+## Save data frames to then load into a clean R for analysis
+save(FedTotalAssets, GDP, )
+
+
+##########################################################################################################
+
 
 
 ## Construct Household Balance Sheet for First and Fifth Quintiles 
