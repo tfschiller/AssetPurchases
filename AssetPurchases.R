@@ -61,7 +61,13 @@ convert_to_xts(Wilshire5000)
 # Create daily index that spans January 2004 - January 2019
 daily<-xts(,seq(start(GDP),end(GDP),"days"))
 
-GDP2<-
+
+# Function that converts datasets of different intervals into daily, filling with most recent value
+convert_to_daily<-function(dataset){
+  aa <-deparse(substitute(dataset))
+  dd <-merge(dataset, daily) 
+  assign(aa, na.locf(dd), env =.GlobalEnv)
+}
 
 
 ## Construct Household Balance Sheet for First and Fifth Quintiles 
