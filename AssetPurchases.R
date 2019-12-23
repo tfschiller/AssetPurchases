@@ -26,8 +26,8 @@ data_reader<-function(column){
 }
 
 data <- data_reader(2)
-names<-tools::file_path_sans_ext(list.files("Data"))
-names(data)<-names
+names<-as.list(tools::file_path_sans_ext(list.files("Data")))
+names(data)<-tools::file_path_sans_ext(list.files("Data"))
 
 # Read in corresponding dates and change name of list items to names of variables
 time <- lapply(paste0("Data/",list.files("Data")), function(x) read_csv(x)[1])
@@ -37,16 +37,29 @@ names(time)<-names
 # For loop to read-in data to Global Environment, variable by variable
 for (i in 1:length(time)) {
   
-  assign(names[i], do.call(rbind, Map(data.frame, A=time[i], B=data[i])), env =.GlobalEnv)
+  assign(unlist(names[i]), do.call(rbind, Map(data.frame, A=time[i], B=data[i])), env =.GlobalEnv)
   
 }
 
-# Convert to xts
+# Convert to xts Extensible Time-Series Object
+convert_to_xts<-function(variable){
+  bb<-deparse(substitute(variable))
+  assign(bb, xts(variable[,-1], order.by = as.Date(variable$DATE)), env =.GlobalEnv)
+}
 
+
+convert_to_xts(FedTotalAssets)
+convert_to_xts(GDP)
+convert_to_xts(LongTermAverageTIPSYield)
+convert_to_xts(MedianSalesPriceHouses)
+convert_to_xts(TenYearTreasuryConstantMaturity)
+convert_to_xts(Wilshire5000)
 
 
 ## Equalise lengths of lists (eg so that there is a GDP entry for each )
-daily<-seq(GDP$GDPC1[1], tail(GDP$GDPC1,1), by="day")
+
+# Create daily index that spans January 2004 - January 2019
+daily<-xts(,seq(start(GDP),end(GDP),"days"))
 
 GDP2<-
 
