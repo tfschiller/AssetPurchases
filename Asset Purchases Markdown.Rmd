@@ -11,7 +11,18 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_chunk$set(fig.width=6.5, fig.height=4) 
+knitr::opts_chunk$set(fig.width=5, fig.height=3) 
+```
+
+```{r load AssetPurchaseData, include=FALSE}
+
+library(zoo)
+library(xts)
+library(here)
+
+setwd(here::here())
+
+load("AssetPurchaseData.RData")
 ```
 
 ## Introduction
@@ -25,22 +36,20 @@ As part of its QE1 programme, the Federal Reserve announced it would buy \$100 b
 \
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
-setwd(here::here())
 library(ggplot2)
 library(dplyr)
 library(tidyverse)
 library(lubridate)
 library(scales)
-library(here)
 
 
-GDP<-read_csv("./Data/FedTotalAssets.csv")
+FedAssets<-read_csv("./Data/FedTotalAssets.csv")
 
 theme_update(plot.title = element_text(hjust = 0.5))
 
-## FED Assets 
+## Fed Assets 
 
-ggplot(GDP, aes(x=as_date(unlist(GDP[1])), y=unlist(GDP[2]), group = 1))+ 
+ggplot(FedAssets, aes(x=as_date(unlist(FedAssets[1])), y=unlist(FedAssets[2]), group = 1))+ 
   geom_line(color = "#09557f",alpha = 0.6,size = 0.7)+ 
   scale_x_date(date_breaks = "1 year", date_labels =  "%Y")+
   theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
@@ -141,4 +150,83 @@ However, \hyperlink{hesse2018}{Hesse et al.'s (2018)} finding that the impact of
 
 \hypertarget{rosa2012}{Rosa, C. (2012). How "Unconventional" Are Large-Scale Asset Purchases? The Impact of Monetary Policy on Asset Prices. \textit{Federal Reserve Bank of New York Staff Reports (560)}.}
 
-\hypertarget{weale2016}{Weale, M., and Wieladek, T. (2016). What are the macroeconomic effects of asset purchases?. \textit{Journal of Monetary Economics}. 79, pp. 81-93.}
+\hypertarget{weale2016}{Weale, M., and Wieladek, T. (2016). What are the macroeconomic effects of asset purchases? \textit{Journal of Monetary Economics}. 79, pp. 81-93.}
+
+##Annex 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+library(zoo)
+
+# GDP
+ggplot(GDP)+ 
+  stat_smooth(aes(x=(index(GDP)), y=(GDP)), method = lm, formula = y ~ poly(x, 25), se = FALSE, color = "#09557f") +
+  scale_x_date(date_breaks = "1 year", date_labels =  "%Y")+
+  theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
+  scale_y_continuous(labels=comma, name="Billions of Chained U.S. Dollars", breaks = scales::pretty_breaks(n = 10))+
+  theme(axis.title=element_text(size=8), axis.text=element_text(size=8))+
+  ggtitle("Figure 2: Real Gross Domestic Product")+theme(plot.title = element_text(size=10))+
+  theme( # remove the vertical grid lines
+    panel.grid.major.x = element_blank() ,
+    # explicitly set the horizontal lines (or they will disappear too)
+    panel.grid.major.y = element_line( size=.3, color="grey" ))+
+  theme(axis.ticks.y = element_blank())+
+  labs(caption="Source: FRED")
+
+# Inflation expectations
+ggplot(InflationExpectations)+ 
+  geom_line(aes(x=(index(InflationExpectations)), y=(InflationExpectations)), color = "#09557f") +
+  scale_x_date(date_breaks = "1 year", date_labels =  "%Y")+
+  theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
+  scale_y_continuous(labels=comma, name="Percent", breaks = scales::pretty_breaks(n = 10))+
+  theme(axis.title=element_text(size=8), axis.text=element_text(size=8))+
+  ggtitle("Figure 3: US Inflation Expectations")+theme(plot.title = element_text(size=10))+
+  theme(panel.grid.major.x = element_blank(),    panel.grid.major.y = element_line( size=.3, color="grey" ))+
+  theme(axis.ticks.y = element_blank())+
+  labs(caption="Source: FRED")
+
+
+# Median Sales Prices
+ggplot(MedianSalesPriceHouses)+ 
+  stat_smooth(aes(x=(index(MedianSalesPriceHouses)), y=(MedianSalesPriceHouses)), method = lm, formula = y ~ poly(x, 27), se = FALSE, color = "#09557f") +
+  scale_x_date(date_breaks = "1 year", date_labels =  "%Y")+
+  theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
+  scale_y_continuous(labels=comma, name="U.S. Dollars", breaks = scales::pretty_breaks(n = 10))+
+  theme(axis.title=element_text(size=8), axis.text=element_text(size=8))+
+  ggtitle("Figure 4: Median Sales Price of Houses Sold for the United States")+theme(plot.title = element_text(size=10))+
+  theme(
+    panel.grid.major.x = element_blank() ,
+    panel.grid.major.y = element_line( size=.3, color="grey" ))+
+  theme(axis.ticks.y = element_blank())+
+  labs(caption="Source: FRED")
+
+
+# Ten Year Treasury Yield
+ggplot(TenYearTreasuryConstantMaturity)+ 
+  geom_line(aes(x=(index(TenYearTreasuryConstantMaturity)), y=(TenYearTreasuryConstantMaturity)), color = "#09557f") +
+  scale_x_date(date_breaks = "1 year", date_labels =  "%Y")+
+  theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
+  scale_y_continuous(labels=comma, name="Percent", breaks = scales::pretty_breaks(n = 10))+
+  theme(axis.title=element_text(size=8), axis.text=element_text(size=8))+
+  ggtitle("Figure 5: 10-Year Treasury Constant Maturity Rate")+theme(plot.title = element_text(size=10))+
+  theme(panel.grid.major.x = element_blank() ,
+        panel.grid.major.y = element_line( size=.3, color="grey" ))+
+  theme(axis.ticks.y = element_blank())+
+  labs(caption="Source: FRED")
+
+
+# Wilshire5000
+ggplot(Wilshire5000)+ 
+  geom_line(aes(x=(index(Wilshire5000)), y=(Wilshire5000)), color = "#09557f") +
+  scale_x_date(date_breaks = "1 year", date_labels =  "%Y")+
+  theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
+  scale_y_continuous(labels=comma, name="Index", breaks = scales::pretty_breaks(n = 10))+
+  theme(axis.title=element_text(size=8), axis.text=element_text(size=8))+
+  ggtitle("Figure 6: Wilshire 5000 Full Cap Price Index")+theme(plot.title = element_text(size=10))+
+  theme(panel.grid.major.x = element_blank() ,
+        panel.grid.major.y = element_line( size=.3, color="grey" ))+
+  theme(axis.ticks.y = element_blank())+
+  labs(caption="Source: FRED")
+
+
+```
