@@ -57,14 +57,19 @@ convert_to_xts(MedianSalesPriceHouses)
 convert_to_xts(TenYearTreasuryConstantMaturity)
 convert_to_xts(Wilshire5000)
 
+# Calucate Inflation Expectations (Inflation Expectation = Treasury Yield - TIPs Yield)
+InflationExpectations<-TenYearTreasuryConstantMaturity - LongTermAverageTIPSYield
 
-# Log and Difference GDP, Median Sales Price, Wilshire 5000 to make Stationary (based on KPSS test) 
+
+# Log and Difference: GDP, Median Sales Price, Wilshire 5000 to make Stationary (based on KPSS test) 
 LogGDPDiff<-diff(log(GDP))
 LogMedianSalesPriceHousesDiff<-diff(log(MedianSalesPriceHouses))
 LogWilshire5000Diff<-diff(log(Wilshire5000))
 
 
-
+# Difference: Long Term TIPS Yield, Ten Year Treasury
+DiffInflationExpectations<-diff(InflationExpectations)
+DiffTenYearTreasury<-diff(TenYearTreasuryConstantMaturity)
 
 
 ## Equalise lengths of lists (eg so that there is a GDP entry for each )
@@ -81,20 +86,18 @@ convert_to_daily<-function(dataset){
 }
 
 convert_to_daily(FedTotalAssets)
-convert_to_daily(GDP)
-convert_to_daily(LongTermAverageTIPSYield)
-convert_to_daily(MedianSalesPriceHouses)
-convert_to_daily(TenYearTreasuryConstantMaturity)
-convert_to_daily(Wilshire5000)
+convert_to_daily(LogGDPDiff)
+convert_to_daily(DiffTIPSYield)
+convert_to_daily(LogMedianSalesPriceHousesDiff)
+convert_to_daily(DiffTenYearTreasury)
+convert_to_daily(LogWilshire5000Diff)
 
 
-## Calucate Inflation Expectations (Inflation Expectation = Treasury Yield - TIPs Yield)
-InflationExpectations<-TenYearTreasuryConstantMaturity - LongTermAverageTIPSYield
 
 
 
 ## Save data frames so they can then be loaded into a clean R for analysis
-save(FedTotalAssets, GDP, InflationExpectations, MedianSalesPriceHouses, TenYearTreasuryConstantMaturity, Wilshire5000, file="AssetPurchaseData.RData")
+save(FedTotalAssets, LogGDPDiff, InflationExpectations, MedianSalesPriceHouses, TenYearTreasuryConstantMaturity, Wilshire5000, file="AssetPurchaseData.RData")
 
 
 ##########################################################################################################
