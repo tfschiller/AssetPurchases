@@ -42,6 +42,7 @@ for (i in 1:length(time)) {
   
 }
 
+
 # Convert to xts Extensible Time-Series Object
 convert_to_xts<-function(variable){
   bb<-deparse(substitute(variable))
@@ -55,6 +56,15 @@ convert_to_xts(LongTermAverageTIPSYield)
 convert_to_xts(MedianSalesPriceHouses)
 convert_to_xts(TenYearTreasuryConstantMaturity)
 convert_to_xts(Wilshire5000)
+
+
+# Log and Difference GDP, Median Sales Price, Wilshire 5000 to make Stationary (based on KPSS test) 
+LogGDPDiff<-diff(log(GDP))
+LogMedianSalesPriceHousesDiff<-diff(log(MedianSalesPriceHouses))
+LogWilshire5000Diff<-diff(log(Wilshire5000))
+
+
+
 
 
 ## Equalise lengths of lists (eg so that there is a GDP entry for each )
@@ -83,7 +93,7 @@ InflationExpectations<-TenYearTreasuryConstantMaturity - LongTermAverageTIPSYiel
 
 
 
-## Save data frames so it can then be loaded into a clean R for analysis
+## Save data frames so they can then be loaded into a clean R for analysis
 save(FedTotalAssets, GDP, InflationExpectations, MedianSalesPriceHouses, TenYearTreasuryConstantMaturity, Wilshire5000, file="AssetPurchaseData.RData")
 
 
