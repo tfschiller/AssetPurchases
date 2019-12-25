@@ -11,7 +11,7 @@ gc()
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 # Load packages
-toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr", "astsa", "vars", "urca", "lubridate", "rlist", "zoo", "xts")
+toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr", "astsa", "vars", "urca", "lubridate", "rlist", "zoo", "xts", "scales")
 
 lapply(toload,require, character.only = T)
 
@@ -87,7 +87,7 @@ convert_to_daily<-function(dataset){
 
 convert_to_daily(FedTotalAssets)
 convert_to_daily(LogGDPDiff)
-convert_to_daily(DiffTIPSYield)
+convert_to_daily(DiffInflationExpectations)
 convert_to_daily(LogMedianSalesPriceHousesDiff)
 convert_to_daily(DiffTenYearTreasury)
 convert_to_daily(LogWilshire5000Diff)
@@ -97,7 +97,7 @@ convert_to_daily(LogWilshire5000Diff)
 
 
 ## Save data frames so they can then be loaded into a clean R for analysis
-save(FedTotalAssets, LogGDPDiff, InflationExpectations, MedianSalesPriceHouses, TenYearTreasuryConstantMaturity, Wilshire5000, file="AssetPurchaseData.RData")
+save(FedTotalAssets, GDP, LogGDPDiff, InflationExpectations, DiffInflationExpectations, MedianSalesPriceHouses, LogMedianSalesPriceHousesDiff, TenYearTreasuryConstantMaturity, DiffTenYearTreasury, Wilshire5000, LogWilshire5000Diff, file="AssetPurchaseData.RData")
 
 
 ##########################################################################################################
