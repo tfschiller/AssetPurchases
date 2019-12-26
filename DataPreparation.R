@@ -11,8 +11,8 @@ gc()
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 # Load packages
-toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr", "astsa", "vars", "urca", "lubridate", "rlist", "zoo", "xts", "scales")
-
+toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr", "astsa", "vars", "urca", "lubridate", 
+            "rlist", "zoo", "xts", "scales", "tseries")
 lapply(toload,require, character.only = T)
 
 
@@ -62,6 +62,7 @@ InflationExpectations<-TenYearTreasuryConstantMaturity - LongTermAverageTIPSYiel
 
 
 # Log and Difference: GDP, Median Sales Price, Wilshire 5000 to make Stationary (based on KPSS test) 
+LogFedTotalAssetsDiff<-diff(log(FedTotalAssets))
 LogGDPDiff<-diff(log(GDP))
 LogMedianSalesPriceHousesDiff<-diff(log(MedianSalesPriceHouses))
 LogWilshire5000Diff<-diff(log(Wilshire5000))
@@ -86,6 +87,7 @@ convert_to_daily<-function(dataset){
 }
 
 convert_to_daily(FedTotalAssets)
+convert_to_daily(LogFedTotalAssetsDiff)
 convert_to_daily(LogGDPDiff)
 convert_to_daily(DiffInflationExpectations)
 convert_to_daily(LogMedianSalesPriceHousesDiff)
@@ -97,7 +99,7 @@ convert_to_daily(LogWilshire5000Diff)
 
 
 ## Save data frames so they can then be loaded into a clean R for analysis
-save(FedTotalAssets, GDP, LogGDPDiff, InflationExpectations, DiffInflationExpectations, MedianSalesPriceHouses, LogMedianSalesPriceHousesDiff, TenYearTreasuryConstantMaturity, DiffTenYearTreasury, Wilshire5000, LogWilshire5000Diff, file="AssetPurchaseData.RData")
+save(FedTotalAssets, LogFedTotalAssetsDiff, GDP, LogGDPDiff, LongTermAverageTIPSYield, InflationExpectations, DiffInflationExpectations, MedianSalesPriceHouses, LogMedianSalesPriceHousesDiff, TenYearTreasuryConstantMaturity, DiffTenYearTreasury, Wilshire5000, LogWilshire5000Diff, file="AssetPurchaseData.RData")
 
 
 ##########################################################################################################
