@@ -11,7 +11,8 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_chunk$set(fig.width=5, fig.height=3) 
+knitr::opts_chunk$set(fig.width=5, fig.height=3)
+
 ```
 
 ```{r load AssetPurchaseData, include=FALSE}
@@ -19,10 +20,13 @@ knitr::opts_chunk$set(fig.width=5, fig.height=3)
 library(zoo)
 library(xts)
 library(here)
+library(gtable)
 
-setwd(here::here())
+
+knitr::opts_knit$set(root.dir = getwd())
 
 load("AssetPurchaseData.RData")
+
 ```
 
 ## Introduction
@@ -34,7 +38,7 @@ At the time, the FOMC stated that along with cutting its federal funds rate targ
 As part of its QE1 programme, the Federal Reserve announced it would buy \$100 billion in government-sponsored enterprise debt and up to \$500 billion worth of mortgage-backed securities. Since QE1, the Federal Reserve has conducted two further LSAP programmes: QE2 (announced in March 2010) and QE3 (announced in September 2012). These programmes have contributed significantly to the growth in the Federal Reserve's balance sheet (see Figure 1).  
 \
 \
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center'}
 
 library(ggplot2)
 library(dplyr)
@@ -152,11 +156,12 @@ However, \hyperlink{hesse2018}{Hesse et al.'s (2018)} finding that the impact of
 
 \hypertarget{weale2016}{Weale, M., and Wieladek, T. (2016). What are the macroeconomic effects of asset purchases? \textit{Journal of Monetary Economics}. 79, pp. 81-93.}
 
+\pagebreak
+
+
 ##Annex 
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-
-library(zoo)
+<center>
+```{r, echo=FALSE, warning=FALSE, message=FALSE, tidy=FALSE, fig.align='center'}
 
 # GDP
 ggplot(GDP)+ 
@@ -165,13 +170,18 @@ ggplot(GDP)+
   theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
   scale_y_continuous(labels=comma, name="Billions of Chained U.S. Dollars", breaks = scales::pretty_breaks(n = 10))+
   theme(axis.title=element_text(size=8), axis.text=element_text(size=8))+
-  ggtitle("Figure 2: Real Gross Domestic Product")+theme(plot.title = element_text(size=10))+
+  ggtitle("Figure 2: Real Gross Domestic Product")+theme(plot.title = element_text(size=9, face = "bold"))+
   theme( # remove the vertical grid lines
     panel.grid.major.x = element_blank() ,
     # explicitly set the horizontal lines (or they will disappear too)
     panel.grid.major.y = element_line( size=.3, color="grey" ))+
   theme(axis.ticks.y = element_blank())+
   labs(caption="Source: FRED")
+```
+\
+\
+\
+```{r, echo=FALSE, warning=FALSE, message=FALSE, tidy=FALSE, fig.align='center'}
 
 # Inflation expectations
 ggplot(InflationExpectations)+ 
@@ -180,11 +190,15 @@ ggplot(InflationExpectations)+
   theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
   scale_y_continuous(labels=comma, name="Percent", breaks = scales::pretty_breaks(n = 10))+
   theme(axis.title=element_text(size=8), axis.text=element_text(size=8))+
-  ggtitle("Figure 3: US Inflation Expectations")+theme(plot.title = element_text(size=10))+
+  ggtitle("Figure 3: US Inflation Expectations")+theme(plot.title = element_text(size=9, face = "bold"))+
   theme(panel.grid.major.x = element_blank(),    panel.grid.major.y = element_line( size=.3, color="grey" ))+
   theme(axis.ticks.y = element_blank())+
   labs(caption="Source: FRED")
-
+```
+\
+\
+\
+```{r, echo=FALSE, warning=FALSE, message=FALSE, tidy=FALSE, fig.align='center'}
 
 # Median Sales Prices
 ggplot(MedianSalesPriceHouses)+ 
@@ -193,13 +207,17 @@ ggplot(MedianSalesPriceHouses)+
   theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
   scale_y_continuous(labels=comma, name="U.S. Dollars", breaks = scales::pretty_breaks(n = 10))+
   theme(axis.title=element_text(size=8), axis.text=element_text(size=8))+
-  ggtitle("Figure 4: Median Sales Price of Houses Sold for the United States")+theme(plot.title = element_text(size=10))+
+  ggtitle("Figure 4: Median Sales Price of Houses Sold for the United States")+theme(plot.title = element_text(size=9, face = "bold"))+
   theme(
     panel.grid.major.x = element_blank() ,
     panel.grid.major.y = element_line( size=.3, color="grey" ))+
   theme(axis.ticks.y = element_blank())+
   labs(caption="Source: FRED")
-
+```
+\
+\
+\
+```{r, echo=FALSE, warning=FALSE, message=FALSE, tidy=FALSE, fig.align='center'}
 
 # Ten Year Treasury Yield
 ggplot(TenYearTreasuryConstantMaturity)+ 
@@ -208,12 +226,16 @@ ggplot(TenYearTreasuryConstantMaturity)+
   theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
   scale_y_continuous(labels=comma, name="Percent", breaks = scales::pretty_breaks(n = 10))+
   theme(axis.title=element_text(size=8), axis.text=element_text(size=8))+
-  ggtitle("Figure 5: 10-Year Treasury Constant Maturity Rate")+theme(plot.title = element_text(size=10))+
+  ggtitle("Figure 5: 10-Year Treasury Constant Maturity Rate")+theme(plot.title = element_text(size=9, face = "bold"))+
   theme(panel.grid.major.x = element_blank() ,
         panel.grid.major.y = element_line( size=.3, color="grey" ))+
   theme(axis.ticks.y = element_blank())+
   labs(caption="Source: FRED")
-
+```
+\
+\
+\
+```{r, echo=FALSE, warning=FALSE, message=FALSE, tidy=FALSE, fig.align='center'}
 
 # Wilshire5000
 ggplot(Wilshire5000)+ 
@@ -222,11 +244,10 @@ ggplot(Wilshire5000)+
   theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
   scale_y_continuous(labels=comma, name="Index", breaks = scales::pretty_breaks(n = 10))+
   theme(axis.title=element_text(size=8), axis.text=element_text(size=8))+
-  ggtitle("Figure 6: Wilshire 5000 Full Cap Price Index")+theme(plot.title = element_text(size=10))+
+  ggtitle("Figure 6: Wilshire 5000 Full Cap Price Index")+theme(plot.title = element_text(size=9, face = "bold"))+
   theme(panel.grid.major.x = element_blank() ,
         panel.grid.major.y = element_line( size=.3, color="grey" ))+
   theme(axis.ticks.y = element_blank())+
   labs(caption="Source: FRED")
-
 
 ```
