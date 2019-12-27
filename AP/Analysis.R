@@ -140,8 +140,13 @@ summary(ur.df(na.omit(LogGDPDiff), type = "trend", selectlags = 'AIC')) # Sugges
 x<-cbind(LogFedTotalAssetsDiff, LogGDPDiff, DiffInflationExpectations, LogMedianSalesPriceHousesDiff, DiffTenYearTreasury, LogWilshire5000Diff)
 colnames(x)<-c('FedTotalAssets', 'LogGDPDiff', 'DiffInflationExpectations', 'LogMedianSalesPriceHousesDiff', 'DiffTenYearTreasury', 'LogWilshire5000Diff')
 
+
+## VAR
+
+# Select appropriate lag based on AIC
 VARselect(na.omit(x), lag.max = 4)
 
+# Compute VAR and plot IRFs
 var<-VAR(na.omit(x), p=3, type = "both")
 plot(irf(var, impulse = 'FedTotalAssets', response = 'LogGDPDiff',  n.ahead = 100, boot = TRUE, runs = 100, ci = 0.95))
 
@@ -154,8 +159,20 @@ plot(irf(var, impulse = 'FedTotalAssets', response = 'DiffTenYearTreasury',  n.a
 plot(irf(var, impulse = 'FedTotalAssets', response = 'LogWilshire5000Diff',  n.ahead = 100, boot = TRUE, runs = 100, ci = 0.95))
 
 
+## Estimating VARs using sign restrictions(following Uhlig 2005, Danne 2015)
+
+# Sign restrictions (ie positive Fed Balance Sheet Shock does not decrease LogGDP or Inflation Expectations for x periods. No sign restrictions are imposed
+# on Median Sales Price of Houses, Ten Year Treasury Yield or Wilshire 5000)
+constr<-c(+1, +2, +3)
+
+y<-cbind()
 
 
+
+model1<- uhlig.reject(ts(na.omit(x)), nlags=12, draws=200, subdraws=200, nkeep=1000, KMIN=1, KMAX=6, constrained=constr, constant=FALSE, steps=60)
+irfs1<-model1$IRFS
+vl <- c("Federal Reserve Total Assets","GDP","Inflation Expectations","Median Sales Price Houses", "Ten Year Treasury Yield", "Wilshire 5000")
+irfplot(irfdraws=irfs1, type="median", labels=vl, save=FALSE, bands=c(0.16, 0.84), grid=TRUE, bw=FALSE)
 
 
 
