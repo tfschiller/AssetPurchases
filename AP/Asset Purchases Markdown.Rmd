@@ -1,0 +1,289 @@
+---
+title: "The Effect of Large-Scale Asset Purchase Programmes on Asset Prices and Inequality"
+author: "Thomas Schiller"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  pdf_document:
+        number_sections: true
+  fig.width: 6
+  fig.height: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=5, fig.height=3)
+
+```
+
+```{r load AssetPurchaseData, include=FALSE}
+
+library(zoo)
+library(xts)
+library(here)
+library(gtable)
+
+
+knitr::opts_knit$set(root.dir = getwd())
+
+load("AssetPurchaseData.RData")
+
+```
+
+
+# Introduction
+
+On October 8 2008, in response to the Global Financial Crisis (GFC), the Federal Reserve, along with five other central banks around the world, collectively cut interest rates. This followed earlier cuts by the Federal Open Market Committee (FOMC), when its federal funds rate target had been lowered from 5.25 percent in June 2006 to 1.5 percent following the cut on October 8 2008. On December 16 2008, the FOMC cut its target rate effectively to zero (specifically, a target rate of between 0 and 0.25 percent). 
+
+At the time, the FOMC stated that along with cutting its federal funds rate target, it would 'employ all available tools to promote the resumption of sustainable economic growth and to preserve price stability' (\hyperlink{fomc2008b}{FOMC 2008b}). With its conventional monetary policy tool at the zero lower bound, the Federal Reserve (along with other central banks) launched a large-scale asset purchase (LSAP) programme on November 25 2008 with the intention of providing additional monetary stimulus to the economy (\hyperlink{hesse2018}{Hesse, Hofmann and Weber 2018}). 
+
+As part of its QE1 programme, the Federal Reserve announced it would buy \$100 billion in government-sponsored enterprise debt and up to \$500 billion worth of mortgage-backed securities. Since QE1, the Federal Reserve has conducted two further LSAP programmes: QE2 (announced in March 2010) and QE3 (announced in September 2012). These programmes have contributed significantly to the growth in the Federal Reserve's balance sheet (see Figure 1).  
+\
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.align='center'}
+
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(lubridate)
+library(scales)
+
+
+FedAssets<-read_csv("./Data/FedTotalAssets.csv")
+
+theme_update(plot.title = element_text(hjust = 0.5))
+
+## Fed Assets 
+
+ggplot(FedAssets, aes(x=as_date(unlist(FedAssets[1])), y=unlist(FedAssets[2]), group = 1))+ 
+  geom_line(color = "#09557f",alpha = 0.6,size = 0.7)+ 
+  scale_x_date(date_breaks = "1 year", date_labels =  "%Y")+
+  theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
+  scale_y_continuous(labels=comma, name="Millions of U.S. Dollars", breaks = scales::pretty_breaks(n = 10))+
+  theme(axis.title=element_text(size=8), axis.text=element_text(size=7))+
+  ggtitle("Figure 1: Federal Reserve Total Assets (Less Eliminations from Consolidation)")+theme(plot.title = element_text(size=8, face="bold"))+
+  theme( # remove the vertical grid lines
+    panel.grid.major.x = element_blank() ,
+    # explicitly set the horizontal lines (or they will disappear too)
+    panel.grid.major.y = element_line( size=.3, color="grey" ))+
+  theme(axis.ticks.y = element_blank())+
+  labs(caption="Source: FRED")
+    
+```
+\
+\
+When the Federal Reserve announced the QE1 programme, it did so with the intention of 'supporting housing markets and fostering improved conditions in financial markets' (\hyperlink{fomc2008a}{FOMC 2008a}). However, despite the fact that the Bank of Japan had experimented with LSAP programmes before 2008 (see \hyperlink{iwata2012}{Iwata and Takenaka 2012} for an overview), the scale and enduring nature of post-2008 LSAP programmes, relative to pre-crisis policy, is what has made these monetary policy tools unconventional. The precise nature of their effects on interest rates, asset prices and the wider macroeconomy the subject of much research.   
+
+This paper analyses the effects of the Federal Reserve's LSAP programmes using data up to the beginning of 2019. Specifically, the effects on asset prices and wealth inequality are analysed. This is done using an SVAR model to compute the effects of the Federal Reserve's LSAP programmes on asset prices, along with macroeconomic and financial variables. The effects will then be used to compute a measure of the effect on inequality, following the approach of \hyperlink{domanski2016}{Domanski, Scatigna and Zabai (2016)}. 
+ 
+ 
+ 
+# Literature Review
+
+## LSAP as a Monetary Policy Tool
+
+LSAP programmes, along with other balance sheet policies, are one of the two ways in which central banks implement monetary policy (the other being interest rate policy). As mentioned, LSAPs have played a significant role in the Federal Reserve's attempts to influence asset prices and financial conditions since 2008 and to stimulate economic conditions after the federal funds target was cut to near zero. 
+
+Two transmission mechansims through which LSAP programmes affect asset prices are commonly identified in the literature^[It is worth pointing out that even for conventional monetary policy, there is no consensus about the mechanisms through which policy influences the real economy. There has been debate about whether interest rate policy operates through the 'cost of borrowing' channel or through 'asset price channels' (\hyperlink{mishkin2016}{Mishkin 2016}). Unsuprisingly then, there is no definite consensus about how unconventional monetary policy affects assets prices and in turn the real economy.]: the 'portfolio rebalancing effect' and the 'signalling effect'. The portfolio balance effect relies on the assumption that assets are imperfect substitutes. This means that as the Federal Reserve buys up safer, longer-term assets (eg long-term Treasuries), the price of these assets has to rise (and yields fall) so that households are willing to move their portfolios into riskier, short term assets, increasing prices and depressing yields on these assets^[More specifically, \hyperlink{wallace1981}{Wallace Neutrality (1981)} does not hold.]. 
+
+Therefore, as well as depressing longer-term yields on the class of assets purchased by the central bank, the portfolio rebalancing effect results in households and private agents moving out of now lower yielding agency debt, MBS and Treasuries into other shorter term, riskier assets such as equities and coporate bonds. This has the effect of reducing the yields and increasing the price on these assets as well (\hyperlink{gagnon2011}{Gagnon, Raskin, Remache and Sack 2011}). Therefore, LSAP programmes have the effect of increasing prices and reducing yields across a broad range of assets^[The portfolio rebalancing effect also works to reduce interest rates through a reduction in risk premiums. Specifically when Federal Reserve purchases longer-term securities it removes 'term premium' - the risk associated with holding longer duration assets, which is an important component in risk premiums - from the market.  Reducing risk premium in general improves market functioning. For wider discussions see \hyperlink{gagnon2011}{Gagnon et al. (2011)} and \hyperlink{mishkin2016}{Mishkin (2016)}.].
+
+The signalling effect occurs when the Federal Reserve makes a credible commitment to continue its LSAP programme into the future. For example, when the Federal Reserve announed QE3, it committed to purchasing \$40 billion worth of MBS and \$45 billion of longer-term Treasuries 'until the outlook for the labour market has improved substantially in a context of price stability' \hyperlink{fomc2013}{(FOMC 2013)}. Therefore the FOMC makes a state-contingent commitment to maintain LSAP progammes until its wider macroeconomic objectives have been achieved, namely achieving its inflation target, increased employment and growth.    
+
+In general this type of commitment signals that monetary policy will be kept loose for a certain duration, with agents having an understanding of the conditions under which monetary policy will be tightened. This should further reduce long-term interest rates as agents know short term rates will be lower for longer. Also, a commitment to continue a LSAP programme indicates interest rates will be held low. Specifically, if the Federal Reserve commits to buying assets at a future date, then the price of these assets will rise now (otherwise arbitrage is possible: agents could buy these assets now and sell them to the Federal Reserve at a higher price at the future as a result of higher demand) (\hyperlink{gangnon2011}{Gagnon et al. 2011}). 
+
+The intention of LSAP programmes, as a result of the portfolio rebalacing effect and the signalling effect, is to depress yields and increase asset prices across different asset classes and maturities. This will help to increase consumption and investment in the economy. LSAP programmes, through the aforementioned portfolio rebalancing and signalling effects, lead to increases in the wealth of households and the value of firms. Households therefore increase their consumption and firms their investment, spurring economic growth and employment. This supports the Federal Reserve's aims of maximising employment and stabilising prices.  
+
+\hyperlink{weale2016}{Weale and Wieladek (2016)} find, using an SVAR, that LSAP programmes implemented in the US and the UK have had positive effects on GDP and CPI. Using monthly data between 2009 and 2014, they find that a LSAP programme shock equivalent to 1% of GDP increases real GDP by 0.62% in the US and 0.25% in the UK. CPI increases by 0.58% in the US and 0.32% in the UK. They suggest that in the US, the portfolio reblancing effect is stronger than the signalling effect. No one dominant mechanism is identified for the UK. 
+
+\hyperlink{hesse2018}{Hesse at al. (2018)} investigate the macroeconomic effects of LSAP programmes in the US and the UK, using a Bayesian VAR. They find an effect of about 0.2% on real GDP and CPI in both countries after a shock equivalent to 1% of GDP. Bond yields fall by up to 0.1% in the US and 0.2% in the UK. Stock prices increase persistantly by up to 2% in the US and 4% in the UK. Interesetingly, they find that the impact of earlier LSAP programmes are larger, possibly because subsequent LSAP programmes come to be anticipated by agents.    
+
+\hyperlink{rosa2012}{Rosa (2012)} uses an 'event study approach' and determines the monetary policy shock by analysing copies of the _Financial Times_ before and after FOMC meetings to determine the extent to which LSAP programmes were anticipated hy agents. \hyperlink{rosa2012}{Rosa (2012)} finds that the effect on the considered asset prices (Treasuries of different maturities, 5-year and 10-year TIPs, S\&P's 500 cash index) is not statistically different from an unanticipated cut in the FOMC target rate. The effect on prices is not explicitly reported. 
+
+\hyperlink{borio2016}{Borio and Zabai (2016)} survey evidence on the effects of unconventional monetary policy measures since 2008. While they conclude that 'there is little doubt that [unconventional monetary policy measures] have had a lasting impact on bond yields [and] various asset prices', it is harder to distengle the effects owing to specific measures individually (for example the impact of LSAP programmes from that of forward guidance).    
+
+## LSAP Programmes and Wealth Inequality
+
+As discussed, LSAP programmes attempt to influence yields and asset prices, in order boosting economic growth and achieve price stability targets. Therefore, in order to assess the impact of LSAP programmes on inequality, there is a need to consider the distribution of affected assets as well as the impact on the yield and price of these assets.
+
+\hyperlink{bunn2018}{Bunn, Pugh and Yeates (2018)} investigate the effect of reductions in interest rates and LSAP programmes on inequality in the UK through the effect on labour incomes, returns on saving and asset prices. Overall, they find that the effect of monetary policy on inequality in the UK between 2008 and 2014 was small. \hyperlink{ampudia2018}{Ampudia et al. (2018)} find that LSAP programmes in the Euro area reduce inequality. This is mainly because LSAP programmes help to reduce unemployment among poorer households.  
+
+\hyperlink{domanski2016}{Domanski et al. (2016)} explore the effect of changes in monetary policy in six advanced economies. They examine the effects on household portfolio balances as a result of changes in interest rates and increases in asset prices due to unconventional monetary. This is done using household surveys on portfolio composition. They assume that changes in portfolio composition are independent of macroeconomic and financial conditions. 
+
+They find that rising equity prices may have added to wealth inequality, and this was only party offset by rising real estate prices. This is because the fifth quintile of the wealth distribution hold a greater proportion of their portfolio as equities, while the second quintile hold a greater proportion of their portfolio in real estate. This suggests that unconventional monetary policy has had the largest effect on inequality through its impact on equity prices.    
+
+# Methodology
+
+Much of the literature that looks at the effects of LSAP programmes follows an 'event study approach' (see \hyperlink{borio2016}{Borio and Zabai (2016)}). This analyses the effect of LSAP programmes using a short time frame immediately before and after the announcement of an LSAP programme. Using a short time frames helps to control for other factors that may influence the variables of interest, thus isolating the effect of monetary policy on asset prices.    
+
+However, \hyperlink{hesse2018}{Hesse et al.'s (2018)} finding that the impact of later LSAP programmes may be reduced because of anticipation by agents reduces the justification for using an event study approach. Some of the effect of the LSAP programme is missed by only considering a short time frame around announcement. Therefore an approach which does not restrict the time frame is justified (see \hyperlink{balatti2016}{Balatti, Brooks, Clements and Kappou (2016)} for a wider discussion of the drawbacks of using an arbitary event window).
+
+This paper uses a vector autoregressive (VAR) framework to attempt to isolate the effects of the Federal Reserve's LSAP programmes. Initially, a standard reduced form VAR is estimated. This allows an analysis of the effect of the Federal Reserve's LSAP programmes on the variables of interest (specifically the median sales price of houses in the US, the yield on a Ten Year Treasury and the Wilshire 5000 index). 
+
+The VAR is specified as follows: 
+
+
+$$Y_{t} = C + \beta_{0}Y_{t-1} + \beta_{1}Y_{t-2} + ... + \beta_{p}Y_{t-p} + \varepsilon_{t}$$
+
+$$\varepsilon_{t} \sim N(0,\small \sum) $$
+where 
+
+
+
+
+
+
+## Limitations
+
+In addition the impact on employment and incomes should be considered (although out of scope for this paper)
+
+This is a partial equilibrium exercise in that no account is taken of the saving, borrowing or default on debt by households. This is because the portfolio composition of households has been fixed. (Domanski et al. 2016)
+OLS is biased: the stronger the correlation of the shock with future values the bigger the bias, the larger the sample the smaller the bias
+Structural break (eg GDP and 2007 GFC), - Markov Switching VAR 
+VARsignR currently allows only partial identification of the model. Partial identification is not necessarily a bad thing. The key idea behind sign restrictions is to characterise a shock through placing restrictions on the responses of some variables, but being agnostic about others. While it is possible to identify all shocks of the model, doing so by just using sign restrictions is inherently difficult. 
+Additional sign restrictions?
+
+
+# Results
+
+## Asset Prices
+
+## Inequality
+
+# Conclusion
+  
+# References {-}
+
+\hypertarget{ampudia2018}{Ampudia, M., Georgarakos, D., Slacalek, J., Tristani, O., Vermeulen, P., and Violante, G. (2018). Monetary policy and household inequality. \textit{ECB Working Paper Series No. 2170}.}s
+
+\hypertarget{balatti2016}{Balatti, M., Brooks, C., Clements, M. P., and Kappou, K. (2016). Did Quantitative Easing only inflate stock prices? Macroeconomic evidence from the US and UK. Macroeconomic Evidence from the US and UK. Available from: \url{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2838128}}
+
+\hypertarget{fomc2008a}{Board of Governors of the Federal Reserve System (2008, November 25) \textit{Federal Reserve announces it will initiate a program to purchase the direct obligations of housing-related government-sponsored enterprises and mortgage-backed securities backed by Fannie Mae, Freddie Mac, and Ginnie Mae} [Press Release]. Retrieved from: \url{https://www.federalreserve.gov/newsevents/pressreleases/monetary20081125b.htm}}
+
+\hypertarget{fomc2008b}{Board of Governors of the Federal Reserve System (2008, December 16) \textit{FOMC Statement} [Press Release]. Retrieved from: \url{https://www.federalreserve.gov/newsevents/pressreleases/monetary20081216b.htm}}
+
+\hypertarget{fomc2013}{Board of Governors of the Federal Reserve System (2013, September 18) \textit{Federal Reserve issues FOMC Statement} [Press Release]. Retrieved from: \url{https://www.federalreserve.gov/newsevents/pressreleases/monetary20130918a.htm}}
+
+\hypertarget{borio2016}{Borio, C. Zabai A. (2016). Unconventional monetary policies:  a re-appraisal.  \textit{BIS Working Papers (No. 570)}.}
+
+\hypertarget{bunn2018}{Bunn, P., Pugh, A., and Yeates, C. (2018). The distributional impact of monetary policy easing in the UK between 2008 and 2014. \textit{Bank of England Staff Working Paper No. 720}.}
+
+\hypertarget{domanski2016}{Domanski, D., Scatigna, M.,   Zabai, A. (2016).  Wealth inequalityand monetary policy.  \textit{BIS Quarterly Review (March)}}.
+
+\hypertarget{gangnon2011}{Gagnon, J., Raskin, M., Remache, J., and Sack, B. (2011). The financial market effects of the Federal Reserve’s large-scale asset purchases. \textit{International Journal of Central Banking}. 7(1), pp. 3-43.}
+
+\hypertarget{hesse2018}{Hesse, H., Hofmann, B., and  Weber, J. (2018).  The macroeconomiceffects of asset purchases revisited. \textit{BIS Working Papers (No.  680)}.}
+
+\hypertarget{iwata2012}{Iwata, K. and Takenaka, S. (2012). Central bank balance sheet expansion: Japan's experience. In: \textit{Are central bank balance sheets in Asia too large?}. Bank for International Settlements, pp. 132-159.}
+
+\hypertarget{mishkin2016}{Mishkin, F. (2016). \underline{The Economics of Money, Banking, and Financial Markets}. 11th ed. Boston: Pearson.}  
+
+\hypertarget{wallace1981}{Wallace, N. (1981). A Modigliani-Miller Theorem For Open-Market Operations. \textit{The American Economic Review}. 71(3), pp. 267-274.}
+
+\hypertarget{rosa2012}{Rosa, C. (2012). How "Unconventional" Are Large-Scale Asset Purchases? The Impact of Monetary Policy on Asset Prices. \textit{Federal Reserve Bank of New York Staff Reports (560)}.}
+
+\hypertarget{weale2016}{Weale, M., and Wieladek, T. (2016). What are the macroeconomic effects of asset purchases? \textit{Journal of Monetary Economics}. 79, pp. 81-93.}
+
+\pagebreak
+
+
+#Annex {-}
+<center>
+```{r, echo=FALSE, warning=FALSE, message=FALSE, tidy=FALSE, fig.align='center'}
+
+# GDP
+ggplot(GDP)+ 
+  stat_smooth(aes(x=(index(GDP)), y=(GDP)), method = lm, formula = y ~ poly(x, 25), se = FALSE, color = "#09557f") +
+  scale_x_date(date_breaks = "1 year", date_labels =  "%Y")+
+  theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
+  scale_y_continuous(labels=comma, name="Billions of Chained U.S. Dollars", breaks = scales::pretty_breaks(n = 10))+
+  theme(axis.title=element_text(size=8), axis.text=element_text(size=7))+
+  ggtitle("Figure 2: Real Gross Domestic Product")+theme(plot.title = element_text(size=9, face = "bold"))+
+  theme( # remove the vertical grid lines
+    panel.grid.major.x = element_blank() ,
+    # explicitly set the horizontal lines (or they will disappear too)
+    panel.grid.major.y = element_line( size=.3, color="grey" ))+
+  theme(axis.ticks.y = element_blank())+
+  labs(caption="Source: FRED")
+```
+\
+\
+\
+```{r, echo=FALSE, warning=FALSE, message=FALSE, tidy=FALSE, fig.align='center'}
+
+# Inflation expectations
+ggplot(InflationExpectations)+ 
+  geom_line(aes(x=(index(InflationExpectations)), y=(InflationExpectations)), color = "#09557f") +
+  scale_x_date(date_breaks = "1 year", date_labels =  "%Y")+
+  theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
+  scale_y_continuous(labels=comma, name="Percent", breaks = scales::pretty_breaks(n = 10))+
+  theme(axis.title=element_text(size=8), axis.text=element_text(size=7))+
+  ggtitle("Figure 3: US Inflation Expectations")+theme(plot.title = element_text(size=8, face = "bold"))+
+  theme(panel.grid.major.x = element_blank(),    panel.grid.major.y = element_line( size=.3, color="grey" ))+
+  theme(axis.ticks.y = element_blank())+
+  labs(caption="Source: FRED")
+```
+\
+\
+\
+```{r, echo=FALSE, warning=FALSE, message=FALSE, tidy=FALSE, fig.align='center'}
+
+# Median Sales Prices
+ggplot(MedianSalesPriceHouses)+ 
+  stat_smooth(aes(x=(index(MedianSalesPriceHouses)), y=(MedianSalesPriceHouses)), method = lm, formula = y ~ poly(x, 27), se = FALSE, color = "#09557f") +
+  scale_x_date(date_breaks = "1 year", date_labels =  "%Y")+
+  theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
+  scale_y_continuous(labels=comma, name="U.S. Dollars", breaks = scales::pretty_breaks(n = 10))+
+  theme(axis.title=element_text(size=8), axis.text=element_text(size=7))+
+  ggtitle("Figure 4: Median Sales Price of Houses Sold for the United States")+theme(plot.title = element_text(size=8, face = "bold"))+
+  theme(
+    panel.grid.major.x = element_blank() ,
+    panel.grid.major.y = element_line( size=.3, color="grey" ))+
+  theme(axis.ticks.y = element_blank())+
+  labs(caption="Source: FRED")
+```
+\
+\
+\
+```{r, echo=FALSE, warning=FALSE, message=FALSE, tidy=FALSE, fig.align='center'}
+
+# Ten Year Treasury Yield
+ggplot(TenYearTreasuryConstantMaturity)+ 
+  geom_line(aes(x=(index(TenYearTreasuryConstantMaturity)), y=(TenYearTreasuryConstantMaturity)), color = "#09557f") +
+  scale_x_date(date_breaks = "1 year", date_labels =  "%Y")+
+  theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
+  scale_y_continuous(labels=comma, name="Percent", breaks = scales::pretty_breaks(n = 10))+
+  theme(axis.title=element_text(size=8), axis.text=element_text(size=7))+
+  ggtitle("Figure 5: 10-Year Treasury Constant Maturity Rate")+theme(plot.title = element_text(size=8, face = "bold"))+
+  theme(panel.grid.major.x = element_blank() ,
+        panel.grid.major.y = element_line( size=.3, color="grey" ))+
+  theme(axis.ticks.y = element_blank())+
+  labs(caption="Source: FRED")
+```
+\
+\
+\
+```{r, echo=FALSE, warning=FALSE, message=FALSE, tidy=FALSE, fig.align='center'}
+
+# Wilshire5000
+ggplot(Wilshire5000)+ 
+  geom_line(aes(x=(index(Wilshire5000)), y=(Wilshire5000)), color = "#09557f") +
+  scale_x_date(date_breaks = "1 year", date_labels =  "%Y")+
+  theme(axis.title.x = element_blank())+theme(panel.grid.minor = element_blank())+
+  scale_y_continuous(labels=comma, name="Index", breaks = scales::pretty_breaks(n = 10))+
+  theme(axis.title=element_text(size=8), axis.text=element_text(size=7))+
+  ggtitle("Figure 6: Wilshire 5000 Full Cap Price Index")+theme(plot.title = element_text(size=8, face = "bold"))+
+  theme(panel.grid.major.x = element_blank() ,
+        panel.grid.major.y = element_line( size=.3, color="grey" ))+
+  theme(axis.ticks.y = element_blank())+
+  labs(caption="Source: FRED")
+
+```
+
+
+```{r, results='asis', echo=FALSE}
+
+load("VARmodel.RData")
+
+library(stargazer)
+
+stargazer(var$varresult,  header=FALSE, type='latex')
+```
