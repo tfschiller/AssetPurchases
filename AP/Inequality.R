@@ -17,26 +17,57 @@ lapply(toload,require, character.only = T)
 
 ## Construct Household Balance Sheet for First and Fifth Quintiles 
 
-financialAsset<-read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="Table 6 16", skip=88)
-financialAssets<-financialAsset[-c(1:6,13:84),]
+# Financial Assets
+financialAsset<-read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="Table 6 16 means")
+financialAssets<-financialAsset[10:15,]
 colnames(financialAssets)[1]<-"Percentile of income"
+colnames(financialAssets)[2:12]<-read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="Table 6 16 means", range = "B3:L3", col_names = FALSE)
 
-stockHolding<-read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="Table 7")
-stockHoldings<-stockHolding[-c(1:7,14:26),-c(2:20,22:31)]
-colnames(stockHoldings)[1]<-"Percentile of income"
-colnames(stockHoldings)[2]<-"Stock Holdings"
-
-nonfinancialAsset<-read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="Table 9 16", skip=2)
-nonfinancialAssets<-nonfinancialAsset[-c(1:92, 99:170),]
+# Non Financial Assets 
+nonfinancialAsset<-read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="Table 9 16 means")
+nonfinancialAssets<-nonfinancialAsset[10:15,]
 colnames(nonfinancialAssets)[1]<-"Percentile of income"
+colnames(nonfinancialAssets)[2:9]<-read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="Table 9 16 means", range = "B3:I3", col_names = FALSE)
 
-headers <- read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="Table 13 16 Alt", range="A90:K91", col_names = FALSE)
+
+# Total Assets
+householdPortfolio<-Reduce(function(x, y) left_join(x, y, by="Percentile of income"), list(financialAssets,nonfinancialAssets))
+colnames(householdPortfolio)[c(11,18)]<-c("Other financial assets", "Other nonfinancial assets")
+householdPortfolio[,2:20]<-as.numeric(unlist(householdPortfolio[,2:20]))
+
+
+
+
+
+
+
+
+row.names(householdPortfolio)<-householdPortfolio[,1]
+householdPortfolio[is.na(householdPortfolio)]<-0
+
+
+# Calculate percent of household portfolio for each asset type by income distrbution
+householdassets <- as.data.frame(lapply(householdPortfolio[,-1], function(x) {
+  x / apply(householdPortfolio[,-1],1,sum)}))*100
+
+rownames(householdassets)<-unlist(unname(householdPortfolio[,1]))
+colnames(householdassets)<-colnames(householdPortfolio[2:20])  
+  
+
+# Debt 
+headers <- read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="Table 13 16 Alt means", range="B3:K4", col_names = FALSE)
 headersDebt <- sapply(headers,paste,collapse="_")
-debt<-read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="Table 13 16 Alt", range="A98:K103", col_names = FALSE)
+debt<-read_excel("scf2016_tables_internal_nominal_historical.xlsx", sheet="Table 13 16 Alt means", range="A12:K17", col_names = FALSE)
 names(debt)<-headersDebt
 colnames(debt)[1]<-"Percentile of income"
 
-householdPortfolio<-Reduce(function(x, y) left_join(x, y, by="Percentile of income"), list(financialAssets,stockHoldings,nonfinancialAssets, debt))
+
+
+
+
+
+
+
 colnames(householdPortfolio)[c(11,19,23,24,25,26,28,29,30,31)]<-c("Other financial assets", "Other nonfinancial assets", 
                                                                   "HELOC - Secured by primary residence", "Other residential debt", 
                                                                   "Credit card balances", "Lines of credit not secured by residential property",
@@ -50,6 +81,11 @@ householdPortfolio[,2:31]<-as.numeric(unlist(householdPortfolio[,2:31]))
 pcts <- as.data.frame(lapply(householdPortfolio[,-1], function(x) {
   x / apply(householdPortfolio[,-1],1,sum)
 }))*100
+
+
+# Combine the fifth and sixth rows as these represent the eighth and ninth deciles 
+pcts1<-pcts[-6,]
+pcts1[5,]<-pcts[5,]+pcts[6,]
 
 
 # Keep only the asset class a la Domanski et al 2016
