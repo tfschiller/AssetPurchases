@@ -12,7 +12,7 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 # Load packages
 toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr", "astsa", "vars", "urca", "lubridate", 
-            "rlist", "zoo", "xts", "scales", "tseries")
+            "rlist", "zoo", "xts", "scales", "tseries", "VARsignR")
 
 lapply(toload,require, character.only = T)
 
@@ -147,7 +147,7 @@ colnames(x)<-c('FedTotalAssets', 'LogGDPDiff', 'DiffInflationExpectations', 'Log
 VARselect(na.omit(x), lag.max = 4)
 
 # Compute VAR and plot IRFs
-var<-VAR(na.omit(x), p=3, type = "both")
+var<-VAR(na.omit(x), p=3, type = "const")
 plot(irf(var, impulse = 'FedTotalAssets', response = 'LogGDPDiff',  n.ahead = 100, boot = TRUE, runs = 100, ci = 0.95))
 
 plot(irf(var, impulse = 'FedTotalAssets', response = 'DiffInflationExpectations',  n.ahead = 100, boot = TRUE, runs = 100, ci = 0.95))
@@ -165,15 +165,21 @@ plot(irf(var, impulse = 'FedTotalAssets', response = 'LogWilshire5000Diff',  n.a
 # on Median Sales Price of Houses, Ten Year Treasury Yield or Wilshire 5000)
 constr<-c(+1, +2, +3)
 
-y<-cbind()
+y<-cbind(log(FedTotalAssets)*100, log(GDP)*100, log(InflationExpectations)*100, log(MedianSalesPriceHouses)*100, log(TenYearTreasuryConstantMaturity)*100, log(Wilshire5000)*100)
 
 
 
-model1<- uhlig.reject(ts(na.omit(x)), nlags=12, draws=200, subdraws=200, nkeep=1000, KMIN=1, KMAX=6, constrained=constr, constant=FALSE, steps=60)
+model1<- uhlig.reject(ts(na.omit(y)), nlags=12, draws=200, subdraws=200, nkeep=1000, KMIN=1, KMAX=31, constrained=constr, constant=FALSE, steps=60)
 irfs1<-model1$IRFS
 vl <- c("Federal Reserve Total Assets","GDP","Inflation Expectations","Median Sales Price Houses", "Ten Year Treasury Yield", "Wilshire 5000")
+
+# Saves a copy of the impulse responses to working directory to be used in markdown
 irfplot(irfdraws=irfs1, type="median", labels=vl, save=FALSE, bands=c(0.16, 0.84), grid=TRUE, bw=FALSE)
 
+fevd1 <- model1$FEVDS
+fevdplot(fevd1, label=vl, save=FALSE, bands=c(0.16, 0.84), grid=TRUE,
+         bw=FALSE, table=FALSE, periods=NULL)
 
+save(var, model1, irfs1, file = "VARmodel.RData")
 
 

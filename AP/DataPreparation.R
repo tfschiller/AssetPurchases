@@ -88,14 +88,16 @@ convert_to_daily<-function(dataset){
 
 convert_to_daily(FedTotalAssets)
 convert_to_daily(LogFedTotalAssetsDiff)
+convert_to_daily(GDP)
 convert_to_daily(LogGDPDiff)
+convert_to_daily(InflationExpectations)
 convert_to_daily(DiffInflationExpectations)
+convert_to_daily(MedianSalesPriceHouses)
 convert_to_daily(LogMedianSalesPriceHousesDiff)
+convert_to_daily(TenYearTreasuryConstantMaturity)
 convert_to_daily(DiffTenYearTreasury)
+convert_to_daily(Wilshire5000)
 convert_to_daily(LogWilshire5000Diff)
-
-
-
 
 
 ## Save data frames so they can then be loaded into a clean R for analysis
