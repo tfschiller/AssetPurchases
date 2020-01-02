@@ -12,7 +12,7 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 # Load packages
 toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr", "astsa", "vars", "urca", "lubridate", 
-            "rlist", "zoo", "xts", "scales", "tseries")
+            "rlist", "zoo", "xts", "scales", "tseries", "VARsignR")
 lapply(toload,require, character.only = T)
 
 
@@ -34,7 +34,6 @@ names(data)<-tools::file_path_sans_ext(list.files("Data"))
 time <- lapply(paste0("Data/",list.files("Data")), function(x) read_csv(x)[1])
 names(time)<-names
 
-
 # For loop to read-in data to Global Environment, variable by variable
 for (i in 1:length(time)) {
   
@@ -42,13 +41,11 @@ for (i in 1:length(time)) {
   
 }
 
-
 # Convert to xts Extensible Time-Series Object
 convert_to_xts<-function(variable){
   bb<-deparse(substitute(variable))
   assign(bb, xts(variable[,-1], order.by = as.Date(variable$DATE)), env =.GlobalEnv)
 }
-
 
 convert_to_xts(FedTotalAssets)
 convert_to_xts(GDP)
@@ -60,13 +57,11 @@ convert_to_xts(Wilshire5000)
 # Calucate Inflation Expectations (Inflation Expectation = Treasury Yield - TIPs Yield)
 InflationExpectations<-TenYearTreasuryConstantMaturity - LongTermAverageTIPSYield
 
-
 # Log and Difference: GDP, Median Sales Price, Wilshire 5000 to make Stationary (based on KPSS test)
 LogFedTotalAssetsDiff<-diff(log(FedTotalAssets))
 LogGDPDiff<-diff(log(GDP))
 LogMedianSalesPriceHousesDiff<-diff(log(MedianSalesPriceHouses))
 LogWilshire5000Diff<-diff(log(Wilshire5000))
-
 
 # Difference: Long Term TIPS Yield, Ten Year Treasury
 DiffInflationExpectations<-diff(InflationExpectations)
@@ -77,7 +72,6 @@ DiffTenYearTreasury<-diff(TenYearTreasuryConstantMaturity)
 
 # Create daily index that spans January 2004 - January 2019
 daily<-xts(,seq(start(GDP),end(GDP),"days"))
-
 
 # Function that converts datasets of different intervals into daily, filling with most recent value using daily index
 convert_to_daily<-function(dataset){

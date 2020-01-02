@@ -13,19 +13,21 @@ Thomas Schiller \
 \'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\
 \
 \
-- Open DataPreparation.R. Make sure that this file is in the same folder as the 
+1) Open DataPreparation.R. Make sure that this file is in the same folder as the 
 \f1\i Data
 \f0\i0  folder (ie the folder containing the csv files). The R script will dynamically set the working directory and will search for the CSV files in the 
 \f1\i Data
 \f0\i0  folder so this folder needs to be located at the same level as the R script.\
 \
-- Run this code. This will import the CSV files and will manipulate them into a suitable time series format to conduct the analysis. It will then save an R Data File with the manipulated datasets into the working directory. See the script for further details.  \
+2) Run this code. This will import the CSV files and will manipulate them into a suitable time series format to conduct the analysis. It will then save an R Data File with the manipulated datasets into the working directory. See the script for further details. Note, the required R libraries that need to be installed are listed in 
+\f1\i toload
+\f0\i0 .  \
 \
-- Run the Analysis.R file. This conducts appropriate statistical tests and computes the IRFs for the analysis of the effect of the Federal Reserve's LSAP programmes on asset prices. The IRF plot for Uhlig\'92s (2005) rejection method are automatically saved into the working directory as an EPS image. It appears as if the VARSignR package was not built for interactive use so this is the work around.  \
+3) Run the Analysis.R file. This conducts appropriate statistical tests and computes the IRFs for the analysis of the effect of the Federal Reserve's LSAP programmes on asset prices. The IRF plot for Uhlig\'92s (2005) rejection method are automatically saved into the working directory as an EPS image. It appears as if the VARSignR package was not built for interactive use so this is the work around.  \
 \
-- Run the Inequality.R file. This will compute and save the household portfolio tables for use in the R Markdown file. \
+4) Run the Inequality.R file. This will compute and save the household portfolio tables for use in the R Markdown file. \
 \
-- All the relevant analysis and graphics are included in the Asset Purchases Markdown.Rmd file. Note that this is set up to compile as a PDF (an installation of LaTeX is required). Also for this to compile, the 
+5) All the relevant analysis and graphics are included in the Asset Purchases Markdown.Rmd file. Note that this is set up to compile as a PDF (an installation of LaTeX is required). Also for this to compile, the 
 \f1\i Latin Modern 
 \f0\i0 font (TTF) needs to be installed. \
 }

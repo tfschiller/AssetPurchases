@@ -10,8 +10,8 @@ gc()
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 # Load packages
-toload<-c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr", "astsa", "vars", "urca", "lubridate", "rlist", "zoo", "xts")
-
+toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr", "astsa", "vars", "urca", "lubridate", 
+            "rlist", "zoo", "xts", "scales", "tseries", "VARsignR")
 lapply(toload,require, character.only = T)
 
 
@@ -39,9 +39,7 @@ householdPortfolio[5,2:20]<-householdPortfolio[5,2:20]+householdPortfolio[6,2:20
 householdPortfolio<-householdPortfolio[-6,]
 householdPortfolio[c(1,5),1]<-c("0–19.9", "80–100")
 
-
 householdPortfolio[is.na(householdPortfolio)]<-0
-
 
 
 ## Calculate percent of household portfolio for each asset type by income distrbution
@@ -58,12 +56,10 @@ colnames(debt)[1:length(debt)]<-c("Percentile of income", "Mortgages - Secured b
                                                                   "Credit card balances", "Lines of credit not secured by residential property", "Education loans",
                                                                   "Vehicle loans", "Other installment loans", "Other debt", "Any debt")
 
-
 # Combine the fifth and sixth rows as these represent the eighth and ninth deciles 
 debt[5,2:11]<-debt[5,2:11]+debt[6,2:11]
 debt<-debt[-6,]
 debt[c(1,5),1]<-c("0–19.9", "80–100")
-
 
 # Calculate libaility type as percentage of total debt
 householddebt<-as.data.frame(lapply(debt[,-1], function(x) {
@@ -83,7 +79,6 @@ Assets<-cbind("Percentile of income"=householdassets$`Percentile of income`, Dep
               Bonds=householdassets$`Savings bonds`+householdassets$Bonds,
               "Mutual funds"=rowSums(householdassets[c(7,8,10)]),
               "Real estate"=householdassets$`Primary residence`+householdassets$`Other residential property`+householdassets$`Equity in nonresidential property`)
-
 
 Debts<-cbind("Mortgage debt"=rowSums(householddebt[2:4]),
              "Other debt"=rowSums(householddebt[5:11]))
@@ -105,6 +100,7 @@ balanceSheet<-as_data_frame(cbind(Assets, Debts))
 # Set number of decimal places
 balanceSheet[,2:8]<-matrix(data=as.numeric(unlist(balanceSheet[,2:8])),nrow = 5, ncol = 7)
 balanceSheet<- balanceSheet %>% mutate_if(is.numeric, round, digits = 2)
+
 
 save(debt, balanceSheet, meansBalanceSheet, file = "InequalityTables.RData")
 

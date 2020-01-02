@@ -13,12 +13,12 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 # Load packages
 toload <- c("ggplot2", "ggfortify","forecast","tidyverse","stargazer", "lodown", "readxl", "dplyr", "astsa", "vars", "urca", "lubridate", 
             "rlist", "zoo", "xts", "scales", "tseries", "VARsignR")
-
 lapply(toload,require, character.only = T)
 
 
 ## Load preprepared data
 load("AssetPurchaseData.RData")
+
 
 ## Plot and examine data visually
 
@@ -49,8 +49,6 @@ ggplot(na.omit(InflationExpectations))+
   theme(axis.ticks.y = element_blank())+
   labs(caption="Source: FRED")
 
-
-
 # TIPS Yields
 ggplot(LongTermAverageTIPSYield)+ 
   geom_line(aes(x=(index(LongTermAverageTIPSYield)), y=(LongTermAverageTIPSYield)), color = "#09557f") +
@@ -63,7 +61,6 @@ ggplot(LongTermAverageTIPSYield)+
     panel.grid.major.y = element_line( size=.3, color="grey" ))+
   theme(axis.ticks.y = element_blank())+
   labs(caption="Source: FRED")
-
 
 # Median Sales Prices
 ggplot(MedianSalesPriceHouses)+ 
@@ -79,7 +76,6 @@ ggplot(MedianSalesPriceHouses)+
   theme(axis.ticks.y = element_blank())+
   labs(caption="Source: FRED")
 
-
 # Ten Year Treasury Yield
 ggplot(TenYearTreasuryConstantMaturity)+ 
   geom_line(aes(x=(index(TenYearTreasuryConstantMaturity)), y=(TenYearTreasuryConstantMaturity)), color = "#09557f") +
@@ -92,7 +88,6 @@ ggplot(TenYearTreasuryConstantMaturity)+
         panel.grid.major.y = element_line( size=.3, color="grey" ))+
   theme(axis.ticks.y = element_blank())+
   labs(caption="Source: FRED")
-
 
 # Wilshire5000
 ggplot(Wilshire5000)+ 
@@ -116,7 +111,6 @@ kpss.test(GDP, null = "Trend", lshort = TRUE) # Unit root at 1%
 kpss.test(InflationExpectations, null = "Trend", lshort = TRUE) # Unit root at 1% 
 kpss.test(MedianSalesPriceHouses, null = "Trend", lshort = TRUE) # Unit root at 1% 
 
-
 # Check Partial Autocorrelation and for the presence of a unit root (difference stationarity)
 ggPacf(LogGDPDiff)
 adf.test(na.omit(LogGDPDiff), k=1)
@@ -135,7 +129,6 @@ adf.test(na.omit(LogWilshire5000Diff), k=1)
 
 summary(ur.df(na.omit(LogGDPDiff), type = "trend", selectlags = 'AIC')) # Suggests lag of one 
 
-
 # Combined relevant variables into a single matrix
 x<-cbind(LogFedTotalAssetsDiff, LogGDPDiff, DiffInflationExpectations, LogMedianSalesPriceHousesDiff, DiffTenYearTreasury, LogWilshire5000Diff)
 colnames(x)<-c('FedTotalAssets', 'LogGDPDiff', 'DiffInflationExpectations', 'LogMedianSalesPriceHousesDiff', 'DiffTenYearTreasury', 'LogWilshire5000Diff')
@@ -148,6 +141,7 @@ VARselect(na.omit(x), lag.max = 4)
 
 # Compute VAR and plot IRFs
 var<-VAR(na.omit(x), p=3, type = "const")
+par(mar=c(1,1,1,1))
 plot(irf(var, impulse = 'FedTotalAssets', response = 'LogGDPDiff',  n.ahead = 100, boot = TRUE, runs = 100, ci = 0.95))
 
 plot(irf(var, impulse = 'FedTotalAssets', response = 'DiffInflationExpectations',  n.ahead = 100, boot = TRUE, runs = 100, ci = 0.95))
@@ -167,14 +161,13 @@ constr<-c(+1, +2, +3)
 
 y<-cbind(log(FedTotalAssets)*100, log(GDP)*100, log(InflationExpectations)*100, log(MedianSalesPriceHouses)*100, log(TenYearTreasuryConstantMaturity)*100, log(Wilshire5000)*100)
 
-
-
-model1<- uhlig.reject(ts(na.omit(y)), nlags=12, draws=200, subdraws=200, nkeep=1000, KMIN=1, KMAX=31, constrained=constr, constant=FALSE, steps=60)
+model1<- uhlig.reject(ts(na.omit(y)), nlags=12, draws=200, subdraws=200, nkeep=1000, KMIN=1, KMAX=6, constrained=constr, constant=FALSE, steps=60)
 irfs1<-model1$IRFS
 vl <- c("Federal Reserve Total Assets","GDP","Inflation Expectations","Median Sales Price Houses", "Ten Year Treasury Yield", "Wilshire 5000")
 
-# Saves a copy of the impulse responses to working directory to be used in markdown
-irfplot(irfdraws=irfs1, type="median", labels=vl, save=FALSE, bands=c(0.16, 0.84), grid=TRUE, bw=FALSE)
+
+## Saves a copy of the impulse responses to working directory to be used in markdown
+irfplot(irfdraws=irfs1, type="median", labels=vl, save=TRUE, bands=c(0.16, 0.84), grid=TRUE, bw=TRUE)
 
 fevd1 <- model1$FEVDS
 fevdplot(fevd1, label=vl, save=FALSE, bands=c(0.16, 0.84), grid=TRUE,
